@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity,create_access_toke
 from backend.models import db, User, Subject, Chapter, Quiz, Question, Score
 from datetime import datetime
 from passlib.hash import bcrypt
+from backend.task import *
 class User_Login(Resource):
     def post(self):
         data = request.get_json()
@@ -45,7 +46,6 @@ class User_Signup(Resource):
             password=bcrypt.hash(data['password']),
             dob=datetime.strptime(data['dob'], '%Y-%m-%d').date(),
             full_name=data['full_name'],
-            Is_admin=False,
             qualification=data.get('qualification', '')
         )
         
@@ -257,6 +257,8 @@ class AddQuiz(Resource):
         db.session.commit()
         return {'message': 'Quiz added successfully'}, 200
     
+    
+    
     @jwt_required()
     def put(self, quiz_id):
         current_user = get_jwt_identity()
@@ -377,3 +379,18 @@ class AddQuestion(Resource):
         db.session.delete(question)
         db.session.commit()
         return {'message': 'Question deleted successfully'}, 200
+    
+class Export_Details(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if current_user== 'admin':
+            return {'message': 'Only Users can access this resource'}, 401
+        claims = get_jwt()
+        user_id = claims['user_id']
+        user=User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+        
+        export_scores.apply_async(args=[user_id])
+        return {'message': 'Export started successfully'}, 200

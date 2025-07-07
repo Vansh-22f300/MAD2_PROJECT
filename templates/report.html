@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Report</title>
+</head>
+<body>
+    <h1>Monthly Report for {{ username }} - {{ month }}</h1>
+    <p>You attempted {{ total_quizzes }} quizzes this month.</p>
+    <p>Your average percentage this month is {{ avg_percentage }}.</p>
+    <table>
+        <tr>
+            <th>Quiz Title</th>
+            <th>Marks Obtained</th>
+            <th>Total Marks</th>
+            <th>Percentage</th>
+        </tr>
+        {% for score in quiz_details %}
+        <tr>
+            <td>{{ score.quiz.title }}</td>
+            <td>{{ score.marks_obtained }}</td>
+            <td>{{ score.total_marks }}</td>
+            <td>{{ score.percentage }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
