@@ -16,13 +16,13 @@ class User_Login(Resource):
             access_token = create_access_token(identity=user.username, additional_claims={'user_id': user.id})
             
             if user.Is_admin:
-                return {'message': 'Login successful', 
+                return {'message': 'Admin Login successful', 
                         'access_token': access_token, 
                         # 'Is_admin': True,
                         'user_id':user.id, 
                         'username': user.username}, 200
             else:
-                return {'message': 'Login successful', 
+                return {'message': 'User Login successful', 
                         'access_token': access_token, 
                         # 'Is_admin': False,
                         'user_id':user.id, 
@@ -46,7 +46,11 @@ class User_Signup(Resource):
             password=bcrypt.hash(data['password']),
             dob=datetime.strptime(data['dob'], '%Y-%m-%d').date(),
             full_name=data['full_name'],
+            gender = data['gender'],
+            phone = data['phone'],
+            address = data['address'],
             qualification=data.get('qualification', '')
+            
         )
         
         db.session.add(user)

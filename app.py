@@ -35,7 +35,12 @@ def admin_setup():
             dob=datetime.strptime('2000-01-01', '%Y-%m-%d').date(),
             full_name='Admin User',
             Is_admin=True,
+            gender = 'Male',
+            phone = '1234567890',
+            address = '123 Admin St, Admin City, Admin Country',
+            status = 'Active',
             qualification='Admin'
+            
         )
         db.session.add(admin)
         db.session.commit()

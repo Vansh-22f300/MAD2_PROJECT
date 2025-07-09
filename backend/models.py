@@ -11,7 +11,12 @@ class User(db.Model):
     dob= db.Column(db.Date, nullable=False)
     full_name = db.Column(db.String(120), nullable=False)
     Is_admin = db.Column(db.Boolean, default=False)
+    gender = db.Column(db.String(50), nullable=False)  # New field for gender
+    phone = db.Column(db.String(15), nullable=False)  # New field for phone number
+    address = db.Column(db.String(255), nullable=False)  # New field for address
+    status=db.Column(db.String(50),default='Active')
     qualification = db.Column(db.String(120), nullable=True)
+    
     # profile_picture = db.Column(db.String(200), nullable=True)  # URL or path to profile picture
     
     scores = db.relationship('Score', back_populates='user', cascade='all,delete')
