@@ -227,9 +227,9 @@ class AddQuiz(Resource):
                 'title': quiz.title,
                 'description': quiz.description,
                 'chapter_id': quiz.chapter_id,
-                'Is_active': quiz.is_active,
+                'Is_active': quiz.Is_active,
                 'date': quiz.date.strftime('%Y-%m-%d'),
-                'time_limit': str(quiz.time_limit),
+                'time_limit': quiz.time_limit.strftime('%H:%M:%S'),
                 'single_attempt': quiz.single_attempt,
                 'chapter_name': quiz.chapter.name,
                 'subject_name': quiz.chapter.subject.name 
@@ -238,13 +238,13 @@ class AddQuiz(Resource):
         return quiz_json, 200
 
     @jwt_required()
-    def post(self, chapter_id):
+    def post(self):
         current_user = get_jwt_identity()
         if current_user!= 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
         
         data = request.get_json()
-        chapter=Chapter.query.filter_by(id=chapter_id).first()
+        chapter=Chapter.query.filter_by(id=data['chapter_id']).first()
         if not chapter:
             return {'message': 'Chapter not found'}, 404
         
@@ -268,22 +268,50 @@ class AddQuiz(Resource):
         current_user = get_jwt_identity()
         if current_user!= 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
-        
         data = request.get_json()
+        print(f"Received data for PUT /edit_quiz/{quiz_id}: {data}") # Keep this for debugging!
         quiz = Quiz.query.filter_by(id=quiz_id).first()
         if not quiz:
             return {'message': 'Quiz not found'}, 404
+        if 'title' in data:
+            quiz.title = data['title']
+        if 'description' in data:
+            quiz.description = data['description']
+        if 'chapter_id' in data:
+            quiz.chapter_id = data['chapter_id']
         
-        quiz.title = data['title']
-        quiz.description = data.get('description', '')
-        quiz.chapter_id = data['chapter_id']
-        quiz.Is_active = data.get('Is_active', True)
-        quiz.date = datetime.strptime(data['date'], '%Y-%m-%d')
-        quiz.time_limit = datetime.strptime(data['time_limit'], '%H:%M:%S').time()
-        quiz.single_attempt = data.get('single_attempt')
+        if 'Is_active' in data:
+            if isinstance(data['Is_active'], str): 
+                quiz.Is_active = data['Is_active'].lower() == 'true'
+            else: 
+                quiz.Is_active = bool(data['Is_active'])
         
-        db.session.commit()
-        return {'message': 'Quiz updated successfully'}, 200   
+        if 'date' in data:
+            try:
+                quiz.date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+            except ValueError:
+                return {'message': 'Invalid date format. Expected YYYY-MM-DD'}, 400
+
+        if 'time_limit' in data:
+            try:
+                quiz.time_limit = datetime.strptime(data['time_limit'], '%H:%M:%S').time()
+            except ValueError:
+                return {'message': 'Invalid time limit format. Expected HH:MM:SS'}, 400
+        
+        if 'single_attempt' in data:
+            if isinstance(data['single_attempt'], str):
+                quiz.single_attempt = data['single_attempt'].lower() == 'true'
+            else: 
+                quiz.single_attempt = bool(data['single_attempt'])
+        
+        
+        try:
+            db.session.commit()
+            return {'message': 'Quiz updated successfully'}, 200
+        except Exception as e:
+            db.session.rollback() 
+            print(f"Error updating quiz: {e}")
+            return {'message': 'Failed to update quiz', 'error': str(e)}, 500   
     
     @jwt_required()
     def delete(self, quiz_id):
@@ -303,25 +331,35 @@ class AddQuestion(Resource):
     @jwt_required()
     def get(self, quiz_id):
         current_user = get_jwt_identity()
-        if current_user!= 'admin':
+        if current_user != 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
-            
-        questions = Question.query.all()
+
+        quiz = Quiz.query.filter_by(id=quiz_id).first()
+        if not quiz:
+            return {'message': 'Quiz not found'}, 404
+
+        questions = Question.query.filter_by(quiz_id=quiz_id).all()
         question_json = []
         for question in questions:
             question_json.append({
                 'id': question.id,
-                'question_text': question.question_text,
-                'question_type': question.question_type,
+                'question_tag': question.question_tag,
+                'question_state': question.question_state,
                 'option_1': question.option_1,
                 'option_2': question.option_2,
                 'option_3': question.option_3,
                 'option_4': question.option_4,
                 'correct_answer': question.correct_answer
-                # 'quiz_id': question.quiz_id,
-                # 'chapter_id': question.chapter_id
             })
-        return question_json, 200
+
+        return {
+            'quiz': {
+                'id': quiz.id,
+                'title': quiz.title,
+                'chapter_id': quiz.chapter_id
+            },
+            'questions': question_json
+        }, 200
     
     @jwt_required()
     def post(self, quiz_id):
@@ -333,8 +371,8 @@ class AddQuestion(Resource):
         chapter_id= Quiz.query.filter_by(id=quiz_id).first().chapter_id
         
         question = Question(
-            question_text=data['question_text'],
-            question_type=data['question_type'],
+            question_tag=data['question_tag'],
+            question_state=data['question_state'],
             option_1=data['option_1'],
             option_2=data['option_2'],
             option_3=data['option_3'],
@@ -358,9 +396,9 @@ class AddQuestion(Resource):
         question = Question.query.filter_by(id=question_id).first()
         if not question:
             return {'message': 'Question not found'}, 404
-        
-        question.question_text = data['question_text']
-        question.question_type = data['question_type']
+
+        question.question_tag = data['question_tag']
+        question.question_state = data['question_state']
         question.option_1 = data['option_1']
         question.option_2 = data['option_2']
         question.option_3 = data['option_3']

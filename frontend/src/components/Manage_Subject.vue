@@ -90,9 +90,12 @@
               </tbody>
             </table>
 
-            <button class="btn btn-success mt-2" @click="$emit('add-chapter', subject.id)">
+            <router-link 
+              class="btn btn-sm btn-primary" 
+              :to="'/add_chapter/' + subject.id"
+            >
               <i class="fas fa-plus me-1"></i>Add Chapter
-            </button>
+            </router-link>
           </div>
         </div>
       </div>

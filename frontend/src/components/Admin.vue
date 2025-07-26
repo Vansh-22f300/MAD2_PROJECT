@@ -90,7 +90,7 @@ export default {
           btnColor: "btn btn-warning",
           button: "Go to Quiz Management",
           btnIcon: "fas fa-edit",
-          link: "/quiz_management",
+          link: "/manage_quiz",
         },
       ],
     };

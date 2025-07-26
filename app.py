@@ -68,11 +68,11 @@ def test():
     return {'Time':str(datetime.now())}
 
 api.add_resource(User_Login, '/login')
-api.add_resource(AddSubject,'/add_subject/get', '/add_subject/post')
+api.add_resource(AddSubject,'/add_subject/get', '/add_subject/post','/edit_subject/<int:sub_id>','/delete_subject/<int:sub_id>')
 api.add_resource(User_Signup, '/signup')
-api.add_resource(AddChapter, '/add_chapter/get', '/add_chapter/<int:subject_id>', '/edit_chapter/<int:chapter_id>','/delete_chapter/<int:chapter_id>')
-api.add_resource(AddQuiz,  '/add_quiz/<int:chapter_id>', '/edit_quiz/<int:quiz_id>', '/delete_quiz/<int:quiz_id>')
-api.add_resource(AddQuestion, '/add_question/get', '/add_question/<int:quiz_id>/post', '/edit_question/<int:question_id>', '/delete_question/<int:question_id>')
+api.add_resource(AddChapter, '/add_chapter/get', '/add_chapter/<int:subject_id>', '/edit_chapter/<int:chapter_id>','/delete_chapter/<int:chapter_id>','/get_chapters')
+api.add_resource(AddQuiz,  '/add_quiz', '/edit_quiz/<int:quiz_id>', '/delete_quiz/<int:quiz_id>','/get_quiz')
+api.add_resource(AddQuestion,'/add_question/<int:quiz_id>', '/edit_question/<int:question_id>', '/delete_question/<int:question_id>','/get_questions/<int:quiz_id>')
 api.add_resource(Export_Details, '/export_details')
 
 if __name__ == '__main__':

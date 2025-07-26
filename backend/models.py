@@ -60,8 +60,8 @@ class Quiz(db.Model):
     
 class Question(db.Model):    
     id= db.Column(db.Integer, primary_key=True)
-    question_text= db.Column(db.Text, nullable=False)
-    question_type= db.Column(db.String(500), nullable=False)
+    question_tag= db.Column(db.Text, nullable=False)
+    question_state= db.Column(db.String(500), nullable=False)
     option_1= db.Column(db.String(200), nullable=False)
     option_2= db.Column(db.String(200), nullable=False)
     option_3= db.Column(db.String(200), nullable=False)
