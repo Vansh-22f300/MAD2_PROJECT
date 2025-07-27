@@ -26,18 +26,18 @@
             </h5>
             <p><strong>📌 Statement:</strong> {{ question.question_state }}</p>
             <ul class="list-group mb-3">
-              <li class="list-group-item">🔹 {{ question.option_1 }}</li>
-              <li class="list-group-item">🔹 {{ question.option_2 }}</li>
-              <li class="list-group-item">🔹 {{ question.option_3 }}</li>
-              <li class="list-group-item">🔹 {{ question.option_4 }}</li>
+              <li class="list-group-item">🔹 1. {{ question.option_1 }}</li>
+              <li class="list-group-item">🔹 2.{{ question.option_2 }}</li>
+              <li class="list-group-item">🔹 3. {{ question.option_3 }}</li>
+              <li class="list-group-item">🔹 4. {{ question.option_4 }}</li>
             </ul>
             <p class="text-success fw-semibold">
-              ✅ Correct Answer: {{ question.correct_answer }}
+              ✅ Correct Answer: {{ question['option_' + question.correct_answer.slice(-1)] || 'N/A' }}
             </p>
             <div class="d-flex justify-content-end mt-3 gap-2">
               <button
                 class="btn btn-sm btn-outline-primary"
-                @click="editQuestion(question)"
+                @click="editQuestionModal(question)"
               >
                 ✏️ Edit
               </button>
@@ -52,6 +52,56 @@
         </div>
       </div>
     </div>
+    <!-- Edit Question Modal -->
+    <div class="modal fade" id="editQuestionModal" tabindex="-1" aria-labelledby="editQuestionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editQuestionModalLabel">Edit Question</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editQuestion">
+              <div class="mb-3">
+                <label for="question_tag" class="form-label">Question Tag</label>
+                <input type="text" class="form-control" id="question_tag" v-model="SelectedQuestion.question_tag" />
+              </div>
+              <div class="mb-3">
+                <label for="question_state" class="form-label">Question Statement</label>
+                <textarea class="form-control" id="question_state" rows="3" v-model="SelectedQuestion.question_state"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="option_1" class="form-label">Option 1</label>
+                <input type="text" class="form-control" id="option_1" v-model="SelectedQuestion.option_1" />
+              </div>
+              <div class="mb-3">
+                <label for="option_2" class="form-label">Option 2</label>
+                <input type="text" class="form-control" id="option_2" v-model="SelectedQuestion.option_2" />
+              </div>
+              <div class="mb-3">
+                <label for="option_3" class="form-label">Option 3</label>
+                <input type="text" class="form-control" id="option_3" v-model="SelectedQuestion.option_3" />
+              </div>
+              <div class="mb-3">
+                <label for="option_4" class="form-label">Option 4</label>
+                <input type="text" class="form-control" id="option_4" v-model="SelectedQuestion.option_4" />
+              </div>
+              <div class="mb-3">
+                <label for="correct_answer" class="form-label">Correct Answer</label>
+                <select class="form-select" id="correct_answer" v-model="SelectedQuestion.correct_answer">
+                  <option value="">Select Correct Option</option>
+                  <option value="option_1">{{ SelectedQuestion.option_1 || 'Option 1' }}</option>
+                  <option value="option_2">{{ SelectedQuestion.option_2 || 'Option 2' }}</option>
+                  <option value="option_3">{{ SelectedQuestion.option_3 || 'Option 3' }}</option>
+                  <option value="option_4">{{ SelectedQuestion.option_4 || 'Option 4' }}</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,18 +111,47 @@ export default {
   data() {
   return {
     quiz: null,
-    questions: []
+    questions: [],
+    SelectedQuestion:{
+      id: null,
+      question_tag: '',
+      question_state: '',
+      option_1: '',
+      option_2: '',
+      option_3: '',
+      option_4: '',
+      correct_answer: ''
+    }
   };
 },
   
   methods: {
     
-    editQuestion(question) {
-  
+    editQuestionModal(question) {
+      this.SelectedQuestion = question;
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('editQuestionModal')).show();
+        
+    },
+    editQuestion(){
+      fetch(`http://127.0.0.1:5000/edit_question/${this.SelectedQuestion.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": 'Bearer ' + localStorage.getItem('admin_token')
+        },
+        body: JSON.stringify(this.SelectedQuestion)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('editQuestionModal')).hide();
+        this.fetchQuestions();
+      });
+      
     },
 
     fetchQuestions() {
-  fetch(`http://127.0.0.1:5000/get_questions/${this.$route.params.quiz_id}`, {
+    fetch(`http://127.0.0.1:5000/get_questions/${this.$route.params.quiz_id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -89,7 +168,24 @@ export default {
   });
 },
     deleteQuestion(id) {
-      
+      if (!confirm("Are you sure you want to delete this question?")) {
+        return;
+      }
+      fetch(`http://127.0.0.1:5000/delete_question/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": 'Bearer ' + localStorage.getItem('admin_token')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        this.fetchQuestions();
+      })
+      .catch(error => {
+        console.error("Failed to delete question", error);
+      })
     },
   },
   mounted(){

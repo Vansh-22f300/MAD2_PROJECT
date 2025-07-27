@@ -103,7 +103,3 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 </style>
-
-<!-- Place these in index.html or main layout file -->
-<!-- Bootstrap & Font Awesome CDN Links -->
-<!-- These are needed once globally (not per component) -->

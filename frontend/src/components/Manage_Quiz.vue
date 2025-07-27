@@ -1,6 +1,7 @@
-<template> 
+// managequiz.vue
+
+<template>
   <div>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container-fluid">
         <span class="navbar-text fw-bold text-white me-3">
@@ -35,14 +36,12 @@
       </div>
     </nav>
 
-    <!-- Add Quiz Button -->
     <div class="container mt-4 d-flex justify-content-end">
       <button class="btn btn-primary" @click="AddQuizModal">
         + Add New Quiz
       </button>
     </div>
 
-    <!-- Quiz Cards -->
     <div class="container mt-4">
       <div class="row">
         <div v-for="quiz in quizzes" :key="quiz.id" class="col-md-6 col-lg-4 mb-4">
@@ -65,7 +64,7 @@
               </div>
             </div>
             <div class="card-footer bg-white border-0 d-flex justify-content-between">
-              <router-link class="btn btn-sm btn-success" :to="`/add_question/${quiz.id}`">Add Question</router-link>
+              <button class="btn btn-sm btn-success" @click="openAddQuestionModal(quiz.id)">Add Question</button>
               <router-link class="btn btn-sm btn-info text-white" :to="`/view_questions/${quiz.id}`">View Questions</router-link>
             </div>
           </div>
@@ -73,7 +72,6 @@
       </div>
     </div>
 
-    <!-- Add Quiz Modal -->
     <div class="modal fade" id="addQuizModal" tabindex="-1" aria-labelledby="addQuizModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content shadow">
@@ -128,7 +126,6 @@
         </div>
       </div>
     </div>
-    <!-- Edit Quiz Modal -->
     <div class="modal fade" id="editQuizModal" tabindex="-1" aria-labelledby="editQuizModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content shadow">
@@ -181,14 +178,28 @@
           </div>
         </div>
       </div>
+    <Add_Question v-if="selectedQuizIdForQuestion" 
+                  :quiz-id="selectedQuizIdForQuestion" 
+                  @question-added="handleQuestionAdded" />
   </div>
 </template>
+
 <script>
+import * as bootstrap from 'bootstrap'; 
+// CHANGE 3: Import the Add_Question component (ensure correct path if different)
+import Add_Question from '@/components/Add_Question.vue'; // Adjust path if needed
+
 export default {
+  // CHANGE 4: Register the Add_Question component
+  components: {
+    Add_Question 
+  },
   data() {
     return {
       quizzes: [],
       chapters: [],
+      username: '', // You might need to populate this, e.g., from localStorage
+      searchQuery: '', 
       newQuiz: {
         chapter_id: '',
         title: '',
@@ -198,24 +209,22 @@ export default {
         date: '',
         single_attempt: false
       },
-      quizSearch: '', // Retained your original variable name
-
       SelectedQuiz: {
         id: null,
         chapter_id: '',
         title: '',
         description: '',
         time_limit: '',
-        // Initialize Is_active as a boolean, not a string
-        Is_active: true, // Changed from 'true' to true
+        Is_active: true,
         date: '',
         single_attempt: false
-      }
+      },
+      // CHANGE 5: New data property to store the quiz ID for the Add Question modal
+      selectedQuizIdForQuestion: null 
     };
   },
   computed: {
     filtered_Quizzes() {
-      // Use quizSearch for filtering as per your original code
       const query = this.quizSearch ? this.quizSearch.toLowerCase() : '';
       return this.quizzes.filter(quiz =>
         (quiz.name && quiz.name.toLowerCase().includes(query)) ||
@@ -225,17 +234,15 @@ export default {
   },
   methods: {
     AddQuizModal() {
-      // Reset newQuiz to default values when opening the modal
       this.newQuiz = {
         chapter_id: '',
         title: '',
         description: '',
         time_limit: '',
-        Is_active: true, // Default to true for new quizzes
+        Is_active: true,
         date: '',
         single_attempt: false
       };
-      // Retained your original Bootstrap modal call
       bootstrap.Modal.getOrCreateInstance(document.getElementById('addQuizModal')).show();
     },
     editQuizModal(quiz) {
@@ -244,16 +251,13 @@ export default {
       this.SelectedQuiz.title = quiz.title;
       this.SelectedQuiz.description = quiz.description;
       this.SelectedQuiz.time_limit = quiz.time_limit;
-      this.SelectedQuiz.date = quiz.date;
-      // Convert Is_active to boolean: if it's a string 'true', make it true; otherwise, use !! to convert to boolean
+      // Ensure date is formatted for input type="date"
+      this.SelectedQuiz.date = quiz.date ? new Date(quiz.date).toISOString().split('T')[0] : '';
       this.SelectedQuiz.Is_active = typeof quiz.Is_active === 'string' ? (quiz.Is_active === 'true') : !!quiz.Is_active;
-      // Ensure single_attempt is a boolean
       this.SelectedQuiz.single_attempt = !!quiz.single_attempt;
-      // Retained your original Bootstrap modal call
       bootstrap.Modal.getOrCreateInstance(document.getElementById('editQuizModal')).show();
     },
     editQuiz() {
-      // Retained your original fetch structure and error handling
       fetch(`http://127.0.0.1:5000/edit_quiz/${this.SelectedQuiz.id}`, {
         method: 'PUT',
         headers: {
@@ -266,16 +270,13 @@ export default {
       .then(data => {
         alert(data.message || 'Quiz updated successfully!');
         this.fetchQuizzes();
-        // Retained your original Bootstrap modal call
         bootstrap.Modal.getOrCreateInstance(document.getElementById('editQuizModal')).hide();
       })
       .catch(error => {
         console.error('Error updating quiz:', error);
-        // Retained your original error message style
       });
     },
     fetchQuizzes() {
-      // Retained your original fetch structure and error handling
       fetch('http://127.0.0.1:5000/get_quiz', {
         method: 'GET',
         headers: {
@@ -285,7 +286,6 @@ export default {
       })
       .then(response => response.json())
       .then(data => {
-        // Map fetched data to ensure Is_active and single_attempt are booleans
         this.quizzes = data.map(quiz => ({
           ...quiz,
           Is_active: typeof quiz.Is_active === 'string' ? (quiz.Is_active === 'true') : !!quiz.Is_active,
@@ -294,11 +294,9 @@ export default {
       })
       .catch(error => {
         console.error('Error fetching quizzes:', error);
-        // Retained your original error message style
       });
     },
     addQuiz() {
-      // Retained your original fetch structure and error handling
       fetch('http://127.0.0.1:5000/add_quiz', {
         method: 'POST',
         headers: {
@@ -311,16 +309,13 @@ export default {
       .then(data => {
         alert(data.message || 'Quiz added successfully!');
         this.fetchQuizzes();
-        // Retained your original Bootstrap modal call
         bootstrap.Modal.getOrCreateInstance(document.getElementById('addQuizModal')).hide();
       })
       .catch(error => {
         console.error('Error adding quiz:', error);
-        // Retained your original error message style
       });
     },
     deleteQuiz(id) {
-      // Retained your original confirm dialog and fetch structure
       if (!confirm("Are you sure you want to delete this quiz?")) {
         return;
       }
@@ -338,11 +333,10 @@ export default {
       })
       .catch(error => {
         console.error('Error deleting quiz:', error);
-        this.showMessage('Error', 'Failed to delete quiz: ' + error.message); // Retained your original showMessage call
+        // this.showMessage('Error', 'Failed to delete quiz: ' + error.message); // Original showMessage commented out
       });
     },
     fetchChapters() {
-      // Retained your original fetch structure and error handling
       fetch('http://127.0.0.1:5000/add_chapter/get', {
         method: 'GET',
         headers: {
@@ -357,14 +351,37 @@ export default {
       })
       .catch(error => {
         console.error('Error fetching chapters:', error);
-        // Retained your original error message style
       });
     },
+    // CHANGE 6: Method to open the Add Question modal
+    openAddQuestionModal(quizId) {
+      this.selectedQuizIdForQuestion = quizId; // Set the quiz ID to pass to the modal
+      // Use nextTick to ensure the prop has updated before showing the modal
+      this.$nextTick(() => {
+        // Use the specific ID of the Add Question modal defined in addquestion.vue
+        const addQuestionModalInstance = new bootstrap.Modal(document.getElementById('addQuestionModal'));
+        addQuestionModalInstance.show();
+      });
+    },
+    // CHANGE 7: Handler for the 'question-added' event from the Add_Question component
+    handleQuestionAdded(message) {
+      alert(message); // Display the message received from the modal
+      this.fetchQuizzes(); // Refresh the quiz list, perhaps to update question count
+      // Hide the Add Question modal
+      const addQuestionModalInstance = bootstrap.Modal.getInstance(document.getElementById('addQuestionModal'));
+      if (addQuestionModalInstance) {
+        addQuestionModalInstance.hide();
+      }
+      // Optionally reset the selectedQuizIdForQuestion after the modal is hidden
+      // This is good practice to ensure modal state is clean for next open
+      this.selectedQuizIdForQuestion = null; 
+    }
   },
-
   mounted() {
     this.fetchQuizzes();
     this.fetchChapters();
+    // Fetch username if it's dynamic
+    this.username = localStorage.getItem('username') || 'Admin'; // Example default
   }
 }
 </script>

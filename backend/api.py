@@ -211,9 +211,9 @@ class AddQuiz(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        if current_user!= 'admin':
-            return {'message': 'Access forbidden: Admins only'}, 403
-            
+        
+        claims=get_jwt()
+        user_id=claims['user_id']    
         quizzes = Quiz.query.all()
         quiz_json = []
         for quiz in quizzes:
