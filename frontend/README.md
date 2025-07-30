@@ -27,3 +27,16 @@ npm run dev
 ```sh
 npm run build
 ```
+cd frontend
+npm install
+npm install bootstrap
+
+python app.py
+
+redis server 
+
+celery -A app.celery worker --loglevel=info --pool=solo
+
+celery -A app.celery beat --loglevel=info
+
+mailhog
