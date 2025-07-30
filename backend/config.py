@@ -21,9 +21,7 @@ class LocalConfig(Config):
     CACHE_REDIS_DB=0
     CACHE_REDIS_URL='redis://localhost:6379/0'
     CACHE_DEFAULT_TIMEOUT=300  # 5 minutes
-    CACHE_TYPE = 'simple'
-    CACHE_DEFAULT_TIMEOUT = 300  # 5 minutes
-    
+   
     
     MAIL_SERVER = 'localhost'
     MAIL_PORT = 1025
