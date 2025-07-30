@@ -5,7 +5,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container-fluid">
         <span class="navbar-text fw-bold text-white me-3">
-          <i class="fas fa-user-circle me-2"></i>Welcome, {{ username }}
+          <i class="fas fa-user-circle me-2"></i>Welcome, {{ adminName }}
         </span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
@@ -16,13 +16,13 @@
               <router-link class="nav-link active" to="/admin"><i class="fas fa-home me-1"></i>Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link>
+              <router-link class="nav-link" to="/admin_summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/manage_quiz"><i class="fas fa-clipboard-list me-1"></i>Manage Quizzes</router-link>
+              <router-link class="nav-link" to="/manage_subject"><i class="fas fa-clipboard-list me-1"></i>Manage Subjects</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/manage_user"><i class="fas fa-users-cog me-1"></i>Manage Users</router-link>
+              <router-link class="nav-link" to="/admin_user"><i class="fas fa-users-cog me-1"></i>Manage Users</router-link>
             </li>
           </ul>
           <form class="d-flex me-3" @submit.prevent>
@@ -209,6 +209,7 @@ export default {
         date: '',
         single_attempt: false
       },
+      adminName:'',
       SelectedQuiz: {
         id: null,
         chapter_id: '',
@@ -375,13 +376,31 @@ export default {
       // Optionally reset the selectedQuizIdForQuestion after the modal is hidden
       // This is good practice to ensure modal state is clean for next open
       this.selectedQuizIdForQuestion = null; 
+    },
+    async getAdminName() {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/admin/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        this.adminName = data.username;
+      } else {
+        console.error(data.message);
+      }
+    } catch (err) {
+      console.error('Error:', err);
     }
+  }
   },
   mounted() {
     this.fetchQuizzes();
     this.fetchChapters();
-    // Fetch username if it's dynamic
-    this.username = localStorage.getItem('username') || 'Admin'; // Example default
+    this.getAdminName();
+    
   }
 }
 </script>

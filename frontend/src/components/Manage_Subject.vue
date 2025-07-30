@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div class="container-fluid">
         <span class="navbar-text fw-bold text-white me-3">
-          <i class="fas fa-user-circle me-2"></i>Welcome, {{ username }}
+          <i class="fas fa-user-circle me-2"></i>Welcome, {{ adminName }}
         </span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
@@ -15,19 +15,21 @@
               <router-link class="nav-link active" to="/admin"><i class="fas fa-home me-1"></i>Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link>
+              <router-link class="nav-link" to="/admin_summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/manage_quiz"><i class="fas fa-clipboard-list me-1"></i>Manage Quizzes</router-link>
+              <router-link class="nav-link" to="/manage_quiz"><i class="fas fa-clipboard-list me-1"></i>Manage Quizzes</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/manage_user"><i class="fas fa-users-cog me-1"></i>Manage Users</router-link>
+              <router-link class="nav-link" to="/admin_user"><i class="fas fa-users-cog me-1"></i>Manage Users</router-link>
             </li>
           </ul>
-          <form class="d-flex me-3" @submit.prevent>
+          <form class="d-flex me-3">
             <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search..." v-model="searchQuery">
-              <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+              <input class="form-control" type="search" placeholder="Search..." v-model="searchQuery" />
+              <button class="btn btn-light" type="button">
+                <i class="fas fa-search"></i>
+              </button>
             </div>
           </form>
           <router-link to="/login" class="btn btn-outline-light"><i class="fas fa-sign-out-alt me-1"></i>Logout</router-link>
@@ -53,10 +55,10 @@
           <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
             {{ subject.name }}
             <div>
-              <button class="btn btn-sm btn-warning me-2" @click="$emit('edit-subject', subject)">
+              <button class="btn btn-sm btn-warning me-2" @click="editSubjectModal(subject)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn btn-sm btn-danger" @click="$emit('delete-subject', subject.id)">
+              <button class="btn btn-sm btn-danger" @click="deleteSubject(subject.id)">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -79,10 +81,10 @@
                   <td>{{ chapter.name }}</td>
                   <td>{{ chapter.description }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-secondary me-2" @click="$emit('edit-chapter', chapter)">
+                    <button class="btn btn-sm btn-outline-secondary me-2" @click="editChapterModal(chapter)">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" @click="$emit('delete-chapter', chapter.id)">
+                    <button class="btn btn-sm btn-outline-danger" @click="deleteChapter(chapter.id)">
                       <i class="fas fa-trash"></i>
                     </button>
                   </td>
@@ -135,6 +137,66 @@
         </div>
       </div>
     </div>
+    <!-- Edit Subject Modal -->
+    <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editSubjectModalLabel">Edit Subject</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editSubject">
+              <div class="mb-3">
+                <label for="subjectName" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" id="subjectName" v-model="selectedSubject.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="subjectDescription" v-model="selectedSubject.description" required></textarea>
+              </div>
+              <div class="mb-3">
+              <label for="subjectCode" class="form-label">Code</label>
+              <input type="text" class="form-control" id="subjectCode" v-model="selectedSubject.code" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectCredits" class="form-label">Credits</label>
+                <input type="number" class="form-control" id="subjectCredits" v-model="selectedSubject.credits" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Edit Subject</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Chapter Modal -->
+    <div class="modal fade" id="editChapterModal" tabindex="-1" aria-labelledby="editChapterModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editChapterModalLabel">Edit Chapter</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editChapter">
+              <div class="mb-3">
+                <label for="chapterName" class="form-label">Chapter Name</label>
+                <input type="text" class="form-control" id="chapterName" v-model="selectedChapter.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="chapterDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="chapterDescription" v-model="selectedChapter.description" required></textarea>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Edit Chapter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -147,9 +209,22 @@ export default {
       newSubject: {
         name: '',
         description: '',
-        code:'',
+        code: '',
         credits: ''
-      }
+      },
+      selectedSubject: {
+        id: '',
+        name: '',
+        description: '',
+        code: '',
+        credits: ''
+      },
+      selectedChapter: {
+        id: '',
+        name: '',
+        description: ''
+      },
+      adminName: ''
     };
   },
   computed: {
@@ -158,9 +233,7 @@ export default {
         subject.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
-    username() {
-      return localStorage.getItem('admin_username') || 'Admin';
-    }
+    
   },
   methods: {
     addSubjectModal() {
@@ -178,7 +251,7 @@ export default {
           body: JSON.stringify({
             name: this.newSubject.name,
             description: this.newSubject.description,
-            code:this.newSubject.code,
+            code: this.newSubject.code,
             credits: this.newSubject.credits
           })
         });
@@ -216,14 +289,136 @@ export default {
         .catch(error => {
           console.error('Error fetching subjects:', error);
         });
+    },
+    editSubjectModal(subject) {
+      this.selectedSubject.id = subject.id;
+      this.selectedSubject.name = subject.name;
+      this.selectedSubject.description = subject.description;
+      this.selectedSubject.code = subject.code;
+      this.selectedSubject.credits = subject.credits;
+
+      const modal = new bootstrap.Modal(document.getElementById('editSubjectModal'));
+      modal.show();
+    },
+    editSubject() {
+      fetch(`http://127.0.0.1:5000/edit_subject/${this.selectedSubject.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        },
+        body: JSON.stringify({
+          name: this.selectedSubject.name,
+          description: this.selectedSubject.description,
+          code: this.selectedSubject.code,
+          credits: this.selectedSubject.credits
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+          bootstrap.Modal.getInstance(document.getElementById('editSubjectModal')).hide();
+          this.fetchSubjects();
+        })
+        .catch(error => {
+          console.error('Error editing subject:', error);
+          alert('Failed to edit subject.');
+        });
+    },
+    deleteSubject(id){
+      if (confirm('Are you sure you want to delete this subject?')) {
+      fetch(`http://127.0.0.1:5000/edit_subject/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        this.fetchSubjects();
+      })
+      .catch(error => {
+        console.error('Error deleting subject:', error);
+        alert('Failed to delete subject.');
+      });
     }
+    },
+    editChapterModal(chapter) {
+      this.selectedChapter.id = chapter.id;
+      this.selectedChapter.name = chapter.name;
+      this.selectedChapter.description = chapter.description;
+      const modal = new bootstrap.Modal(document.getElementById('editChapterModal'));
+      modal.show();
+    },
+    editChapter() {
+      fetch(`http://127.0.0.1:5000/edit_chapter/${this.selectedChapter.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        },
+        body: JSON.stringify({
+          name: this.selectedChapter.name,
+          description: this.selectedChapter.description
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+          bootstrap.Modal.getInstance(document.getElementById('editChapterModal')).hide();
+          this.fetchSubjects();
+        })
+        .catch(error => {
+          console.error('Error editing chapter:', error);
+          alert('Failed to edit chapter.');
+        });
+    },
+    deleteChapter(id){
+      if (confirm('Are you sure you want to delete this chapter?')) {
+      fetch(`http://127.0.0.1:5000/delete_chapter/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        this.fetchSubjects();
+      })
+      .catch(error => {
+        console.error('Error deleting chapter:', error);
+        alert('Failed to delete chapter.');
+      });
+    }
+    },
+    async getAdminName() {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/admin/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        this.adminName = data.username;
+      } else {
+        console.error(data.message);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  }
+
   },
   mounted() {
     this.fetchSubjects();
+    this.getAdminName()
   }
 };
 </script>
-
 <style scoped>
 .card-title {
   font-weight: bold;

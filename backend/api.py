@@ -106,13 +106,13 @@ class AddSubject(Resource):
         return {'message': 'Subject added successfully'}, 200
     
     @jwt_required()
-    def put(self):
+    def put(self,sub_id):
         current_user = get_jwt_identity()
         if current_user!= 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
         
         data = request.get_json()
-        subject = Subject.query.filter_by(id=data['id']).first()
+        subject = Subject.query.get(sub_id)
         if not subject:
             return {'message': 'Subject not found'}, 404
         
@@ -124,19 +124,19 @@ class AddSubject(Resource):
         return {'message': 'Subject updated successfully'}, 200       
     
     @jwt_required()
-    def delete(self):
+    def delete(self, sub_id):
         current_user = get_jwt_identity()
-        if current_user!= 'admin':
+        if current_user != 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
-        
-        data = request.get_json()
-        subject = Subject.query.filter_by(id=data['id']).first()
+
+        subject = Subject.query.get(sub_id)
         if not subject:
             return {'message': 'Subject not found'}, 404
+
         db.session.delete(subject)
         db.session.commit()
-        return {'message': 'Subject deleted successfully'}, 200      
-    
+        return {'message': 'Subject deleted successfully'}, 200
+
     
 class AddChapter(Resource):
     @jwt_required()
@@ -436,3 +436,226 @@ class Export_Details(Resource):
         
         export_scores.apply_async(args=[user_id])
         return {'message': 'Export started successfully'}, 200
+    
+class Start_Quiz(Resource):
+    @jwt_required()
+    def get(self, quiz_id):
+        current_user = get_jwt_identity()
+        if current_user == 'admin':
+            return {'message': 'Only Users can access this resource'}, 401
+        
+        claims = get_jwt()
+        user_id = claims['user_id']
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+        
+        quiz = Quiz.query.get(quiz_id)
+        if not quiz:
+            return {'message': 'Quiz not found'}, 404
+
+        questions = Question.query.filter_by(quiz_id=quiz_id).all()
+        if not questions:
+            return {'message': 'Empty quiz, no questions available'}, 404
+            
+        time_limit = quiz.time_limit.hour * 3600 + quiz.time_limit.minute * 60 + quiz.time_limit.second
+        
+        quiz_data = {
+            'id': quiz.id,
+            'title': quiz.title,
+            'description': quiz.description,
+            'chapter': quiz.chapter.name,
+            'time_limit': time_limit,
+            'questions': [
+                {
+                    'id': question.id,
+                    'question_state': question.question_state,
+                    'option_1': question.option_1,
+                    'option_2': question.option_2,
+                    'option_3': question.option_3,
+                    'option_4': question.option_4,
+                    # For security, correct_answer is not included here
+                } for question in questions
+            ]
+        }
+        return quiz_data, 200
+
+    @jwt_required()
+    def post(self, quiz_id):
+        current_user = get_jwt_identity()
+        if current_user == 'admin':
+            return {'message': 'Only Users can access this resource'}, 401
+        
+        claims = get_jwt()
+        user_id = claims['user_id']
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+        
+        quiz = Quiz.query.get(quiz_id)
+        if not quiz:
+            return {'message': 'Quiz not found'}, 404
+            
+        chapter = Chapter.query.get(quiz.chapter_id)
+        subject = Subject.query.get(chapter.subject_id)
+        questions = Question.query.filter_by(quiz_id=quiz_id).all()
+        data = request.get_json()
+        
+        score = 0
+        total_possible_marks = len(questions)
+        
+        if not data.get('answers'):
+            return {'message': 'No answers submitted'}, 400
+
+        user_answers = data.get('answers', {})
+        for question in questions:
+            user_answer = user_answers.get(str(question.id))
+            if user_answer:
+                correct_answer_text = getattr(question, question.correct_answer)
+                if user_answer.strip().lower() == correct_answer_text.strip().lower():
+                    score += 1
+        
+        percentage = (score / total_possible_marks) * 100 if total_possible_marks > 0 else 0
+        grade = 'Excellent' if percentage >= 75 else 'Need to Improve'
+        timestamp = datetime.now()
+        
+        new_score = Score(
+            user_id=user_id,
+            subject_id=subject.id,
+            chapter_id=chapter.id,
+            quiz_id=quiz_id,
+            score=score,
+            date_taken=timestamp,
+            percentage=round(percentage, 2),
+            grade=grade,
+            total_possible_marks=total_possible_marks
+        )
+        
+        db.session.add(new_score)
+        db.session.commit()
+        
+       
+        questions_with_answers = [
+            {
+                'id': q.id,
+                'question_state': q.question_state,
+                'options': [q.option_1, q.option_2, q.option_3, q.option_4],
+                'correct_answer': q.correct_answer
+            } for q in questions
+        ]
+
+        return {
+            'message': 'Quiz Attempted successfully',
+            'score': score,
+            'total_possible_marks': total_possible_marks,
+            'percentage': percentage,
+            'questions': questions_with_answers
+        }, 200
+
+class User_Results(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if current_user == 'admin':
+            return {'message': 'Only Users can access this resource'}, 401
+        
+        claims = get_jwt()
+        user_id = claims['user_id']
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+        
+        scores = Score.query.filter_by(user_id=user_id).all()
+        result = []
+        for score in scores:
+            result.append({
+                'subject_name': score.subject.name,
+                'chapter_name': score.chapter.name,
+                'quiz_title': score.quiz.title,
+                'date_taken': score.date_taken.strftime('%Y-%m-%d %H:%M:%S'),
+                'score': score.score,
+                'total_possible_marks': score.total_possible_marks,
+                'percentage': score.percentage,
+                'grade': score.grade
+            })
+        return result, 200
+    
+class Admin_Summary(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if current_user != 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 401
+
+        # Corrected Query for Pie Chart: Subject-wise attempts
+        subject_attempts = db.session.query(
+            Subject.name,
+            db.func.count(Score.id)
+        ).join(Quiz, Score.quiz_id == Quiz.id
+        ).join(Chapter, Quiz.chapter_id == Chapter.id
+        ).join(Subject, Chapter.subject_id == Subject.id
+        ).group_by(Subject.name
+        ).all()
+        
+        pie_labels = [row[0] for row in subject_attempts]
+        pie_data = [row[1] for row in subject_attempts]
+
+        top_score = db.session.query(
+            Subject.name,
+            db.func.max(Score.score)
+        ).join(Quiz, Score.quiz_id == Quiz.id
+        ).join(Chapter, Quiz.chapter_id == Chapter.id
+        ).join(Subject, Chapter.subject_id == Subject.id
+        ).group_by(Subject.name
+        ).all()
+        
+        bar_labels = [row[0] for row in top_score]
+        bar_data = [row[1] for row in top_score]
+
+        return {
+            'pie_labels': pie_labels,
+            'pie_data': pie_data,
+            'bar_labels': bar_labels,
+            'bar_data': bar_data
+        }, 200
+        
+class Admin_Users(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        if current_user!= 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 401
+        users=User.query.filter_by(Is_admin=False).all()
+        user_json=[]
+        for user in users:
+            user_json.append({
+                'id':user.id,
+                'username':user.username,
+                'email':user.email,
+                'full_name':user.full_name,
+                'dob':user.dob.strftime('%Y-%m-%d'),
+                'gender':user.gender,
+                'phone':user.phone,
+                'address':user.address,
+                # 'status':user.status,
+                'qualification':user.qualification
+            })        
+        return user_json,200    
+    
+class User_Profile(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        return {'username': current_user}, 200  
+    
+         
+class Admin_Profile(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        
+        if current_user != 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 403
+
+        return {'username': current_user}, 200        
+        

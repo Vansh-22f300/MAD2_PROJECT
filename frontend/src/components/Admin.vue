@@ -24,8 +24,8 @@
           </ul>
           <form class="d-flex me-3">
             <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search..." />
-              <button class="btn btn-light" type="submit">
+              <input class="form-control" type="search" placeholder="Search..." v-model="searchQuery" />
+              <button class="btn btn-light" type="button">
                 <i class="fas fa-search"></i>
               </button>
             </div>
@@ -70,7 +70,7 @@ export default {
           btnColor: "btn btn-primary",
           button: "Go to User Management",
           btnIcon: "fas fa-user-cog",
-          link: "/manage_users",
+          link: "/admin_user",
         },
         {
           title: "Manage Subjects",

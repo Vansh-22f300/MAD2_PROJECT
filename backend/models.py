@@ -11,14 +11,11 @@ class User(db.Model):
     dob= db.Column(db.Date, nullable=False)
     full_name = db.Column(db.String(120), nullable=False)
     Is_admin = db.Column(db.Boolean, default=False)
-    gender = db.Column(db.String(50), nullable=False)  # New field for gender
-    phone = db.Column(db.String(15), nullable=False)  # New field for phone number
-    address = db.Column(db.String(255), nullable=False)  # New field for address
+    gender = db.Column(db.String(50), nullable=False)  
+    phone = db.Column(db.String(15), nullable=False)  
+    address = db.Column(db.String(255), nullable=False)  
     status=db.Column(db.String(50),default='Active')
     qualification = db.Column(db.String(120), nullable=True)
-    
-    # profile_picture = db.Column(db.String(200), nullable=True)  # URL or path to profile picture
-    
     scores = db.relationship('Score', back_populates='user', cascade='all,delete')
 
 class Subject(db.Model):
@@ -36,7 +33,6 @@ class Chapter(db.Model):
     name= db.Column(db.String(120), nullable=False)
     description= db.Column(db.String(500), nullable=True)
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    # subject = db.relationship('Subject', backref=db.backref('chapters', lazy=True))
     
     subject = db.relationship('Subject', back_populates='chapters')
     scores = db.relationship('Score', back_populates='chapter', cascade='all,delete')
@@ -68,9 +64,7 @@ class Question(db.Model):
     option_4= db.Column(db.String(200), nullable=False)
     correct_answer= db.Column(db.String(200), nullable=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    # quiz = db.relationship('Quiz', backref=db.backref('questions', lazy=True))
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'), nullable=False)
-    # chapter = db.relationship('Chapter', backref=db.backref('questions', lazy=True))
     
     chapter = db.relationship('Chapter', back_populates='questions')
     quiz = db.relationship('Quiz', back_populates='questions')
@@ -85,7 +79,7 @@ class Score(db.Model):
     date_taken = db.Column(db.DateTime, nullable=False)
     percentage = db.Column(db.Float, nullable=False)
     grade = db.Column(db.String(10), nullable=False)
-    
+    total_possible_marks = db.Column(db.Float, nullable=False)
     user = db.relationship('User', back_populates='scores')
     subject = db.relationship('Subject', back_populates='scores')
     chapter = db.relationship('Chapter', back_populates='scores')

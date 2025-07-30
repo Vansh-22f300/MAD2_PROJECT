@@ -66,39 +66,54 @@ def build_html_email(username, unattempted_quizzes):
 @shared_task
 def export_scores(user_id):
     try:
-        reports_dir=os.path.join(os.getcwd(),'reports')
+        print(f"Export task started for user ID: {user_id}")  # ✅ Debug print
+
+        reports_dir = os.path.join(os.getcwd(), 'reports')
         if not os.path.exists(reports_dir):
             os.makedirs(reports_dir)
-        report_file = os.path.join(reports_dir, f'scores_report_{user_id}_quiz_reports_{datetime.now().strftime("%Y%m%d")}.csv')   
+
+        report_file = os.path.join(
+            reports_dir,
+            f'scores_report_{user_id}_quiz_reports_{datetime.now().strftime("%Y%m%d")}.csv'
+        )
 
         with open(report_file, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Username','Quiz ID','Quiz Title', 'Marks Obtained', 'Total Marks','Date Attempted'])
-            quizzes=db.session.query(
+            writer.writerow(['Username', 'Quiz ID', 'Quiz Title', 'Marks Obtained', 'Total Marks', 'Date Attempted'])
+
+            quizzes = db.session.query(
                 User.username,
                 Quiz.id,
                 Quiz.title,
-                Score.marks_obtained.label('Marks Obtained'),
-                Score.total_marks.label('Total Marks'),
+                Score.score.label('Marks Obtained'),
+                Score.total_possible_marks.label('Total Marks'),
                 Score.date_taken.label('Date Attempted')
-            ).join(Score,Score.quiz_id == Quiz.id).filter(Score.user.id == user_id).all()
+            ).join(Score, Score.quiz_id == Quiz.id) \
+             .join(User, User.id == Score.user_id) \
+             .filter(Score.user_id == user_id).all()
 
             for quiz in quizzes:
-                quiz_id, username, title, marks_obtained, total_marks, date_taken = quiz
+                username, quiz_id, title, score, total_possible_marks, date_taken = quiz
                 writer.writerow([
-                    username, quiz_id, title, marks_obtained, total_marks,date_taken.strftime('%Y-%m-%d')if date_taken else 'N/A'
-                    ])  
-        
-        user= User.query.get(id=user_id).first()
+                    username,
+                    quiz_id,
+                    title,
+                    score,
+                    total_possible_marks,
+                    date_taken.strftime('%Y-%m-%d') if date_taken else 'N/A'
+                ])
+
+        user = User.query.get(user_id)
         mail_config(
-            user.email, 
-            'Your Quiz Scores Report', 
-            'Please find attached your quiz scores report.', 
+            user.email,
+            'Your Quiz Scores Report',
+            'Please find attached your quiz scores report.',
             attachments=report_file
         )
+
     except Exception as e:
-        print(e)
-    
+        print(f"Error in export_scores task: {e}")
+        
 def send_email(user, month, quiz_details, total_quizzes, avg_percentage):
     template_path="templates/report.html"
     with open(template_path, 'r') as template_file:
@@ -119,13 +134,25 @@ def send_email(user, month, quiz_details, total_quizzes, avg_percentage):
         
 @shared_task
 def send_monthly_report():
-    users = User.query.filter_by(Is_admin=True).all()
+    from sqlalchemy import extract
+    print("✅ Monthly report triggered")
+
+    users = User.query.filter_by(Is_admin=False).all()
+    now = datetime.now()
+
     for user in users:
-        month= datetime.now().strftime('%B')
-        quiz_details=Score.query.filter_by(user_id=user.id).all()
+        month = now.strftime('%B')
+
+        quiz_details = Score.query.filter(
+            Score.user_id == user.id,
+            extract('month', Score.date_taken) == now.month,
+            extract('year', Score.date_taken) == now.year
+        ).all()
+
         total_quizzes = len(quiz_details)
-        if total_quizzes >0:
-            avg_percentage=sum(score.percentage for score in quiz_details) / total_quizzes
+        if total_quizzes > 0:
+            avg_percentage = sum(score.percentage for score in quiz_details) / total_quizzes
         else:
             avg_percentage = 0.0
-        send_email(user,month,quiz_details,total_quizzes,avg_percentage)    
+
+        send_email(user, month, quiz_details, total_quizzes, avg_percentage)

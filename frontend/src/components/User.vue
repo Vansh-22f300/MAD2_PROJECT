@@ -6,18 +6,17 @@
         <i class="fas fa-user-circle me-2"></i> Welcome, <strong>{{ username }}</strong>
       </span>
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><router-link class="nav-link text-white" to="/"><i class="fas fa-home me-1"></i>Home</router-link></li>
-        <li class="nav-item"><router-link class="nav-link text-white" to="/summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link></li>
-        <li class="nav-item"><router-link class="nav-link text-white" to="/profile"><i class="fas fa-user me-1"></i>Profile</router-link></li>
+        <li class="nav-item"><router-link class="nav-link text-white" to="/user"><i class="fas fa-home me-1"></i>Home</router-link></li>
+        <li class="nav-item"><router-link class="nav-link text-white" to="/user_results"><i class="fas fa-chart-bar me-1"></i>User Results</router-link></li>
       </ul>
       <form class="d-flex me-3">
         <div class="input-group">
-            <input v-model="searchQuery" class="form-control" type="search" placeholder="Search quiz...">
-            <button class="btn btn-light" type="button" @click="searchQuiz"><i class="fas fa-search"></i></button>
+          <input v-model="searchQuery" class="form-control" type="search" placeholder="Search quiz...">
+          <button class="btn btn-light" type="button" @click="searchQuiz"><i class="fas fa-search"></i></button>
         </div>
       </form>
       <router-link to="/login" class="btn btn-outline-light">
-            <i class="fas fa-sign-out-alt me-1"></i>Logout
+        <i class="fas fa-sign-out-alt me-1"></i>Logout
       </router-link>
     </nav>
 
@@ -50,15 +49,9 @@
                 <div v-if="quiz.score !== null && quiz.score !== undefined" class="alert alert-success py-2 mt-2 mb-2">
                   <i class="fas fa-trophy me-2"></i>Your Score: {{ quiz.score }}/{{ quiz.total }}
                 </div>
-                <div v-else class="alert alert-info py-2 mt-2 mb-2">
-                  <i class="fas fa-info-circle me-2"></i>You have not taken this quiz yet
-                </div>
                 <div class="d-grid gap-2">
-                  <router-link v-if="quiz.score === null || quiz.score === undefined" :to="`/start_quiz/${quiz.id}?first_time=true`" class="btn btn-primary btn-sm">
-                    <i class="fas fa-play me-2"></i>Start Quiz
-                  </router-link>
-                  <router-link v-else :to="`/start_quiz/${quiz.id}`" class="btn btn-warning btn-sm">
-                    <i class="fas fa-redo me-2"></i>Retake Quiz
+                  <router-link :to="'/start_quiz/' + quiz.id" class="btn btn-primary">
+                    <i class="fas fa-play-circle me-2"></i>Start Quiz
                   </router-link>
                 </div>
               </div>
@@ -99,6 +92,8 @@ export default {
       })
       .then(response => response.json())
       .then(data => {
+        console.log('Fetched quizzes:', data);
+
         this.quizzes = data.map(quiz => ({
           ...quiz,
           Is_active: typeof quiz.Is_active === 'string' ? (quiz.Is_active === 'true') : !!quiz.Is_active,
@@ -117,9 +112,30 @@ export default {
       localStorage.removeItem('user_token');
       this.$router.push('/login');
     },
+    async getUsername() {
+    try {
+      const res = await fetch('http://127.0.0.1:5000/user/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('user_token')
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        this.username = data.username;
+      } else {
+        console.error(data.message);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  }
   },
   mounted() {
     this.fetchQuizzes();
+    
+    this.getUsername();
+
   },
 };
 </script>

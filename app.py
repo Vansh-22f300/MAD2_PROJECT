@@ -11,7 +11,14 @@ from backend.api import (User_Login,
                          AddChapter,
                          AddQuiz,
                          AddQuestion,
-                         Export_Details
+                         Export_Details,
+                         Start_Quiz,
+                         User_Results,
+                         Admin_Summary,
+                         Admin_Users,
+                         Admin_Profile,
+                         User_Profile,
+                         
                          )
 from backend.config import cache
 from backend.worker import *
@@ -60,6 +67,8 @@ with app.app_context():
 @app.get('/')
 def index():
     return "Welcome to the Quiz Management System API!"
+from flask import Flask  # if not already imported
+# Make sure mail_config is already imported above
 
 @app.get('/test')
 @cache.cached(timeout=60)  # Cache for 60 seconds
@@ -74,6 +83,15 @@ api.add_resource(AddChapter, '/add_chapter/get', '/add_chapter/<int:subject_id>'
 api.add_resource(AddQuiz,  '/add_quiz', '/edit_quiz/<int:quiz_id>', '/delete_quiz/<int:quiz_id>','/get_quiz')
 api.add_resource(AddQuestion,'/add_question/<int:quiz_id>', '/edit_question/<int:question_id>', '/delete_question/<int:question_id>','/get_questions/<int:quiz_id>')
 api.add_resource(Export_Details, '/export_details')
+api.add_resource(Start_Quiz, '/start_quiz/<int:quiz_id>')
+api.add_resource(User_Results, '/user_results')
+api.add_resource(Admin_Summary, '/admin_summary')
+api.add_resource(Admin_Users, '/admin_users')
+api.add_resource(Admin_Profile, '/admin/profile')
+api.add_resource(User_Profile, '/user/profile')
 
+# celery -A app.celery worker --loglevel=info --pool=solo
+# celery -A app.celery beat --loglevel=info
+# c drive
 if __name__ == '__main__':
     app.run(debug=True)

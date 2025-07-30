@@ -1,32 +1,39 @@
 <template>
-  <div class="add-chapter-container">
-    <form @submit.prevent="addChapter" class="p-4">
-      <h3 class="mb-3">Add Chapter</h3>
-      <div class="mb-3">
-        <label for="name" class="form-label">Chapter Name</label>
-        <input
-          v-model="newChapter.name"
-          type="text"
-          class="form-control"
-          id="name"
-          placeholder="Enter chapter name"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea
-          v-model="newChapter.description"
-          class="form-control"
-          id="description"
-          placeholder="Enter chapter description"
-          required
-        ></textarea>
-      </div>
-      <div class="d-grid gap-2">
-        <button type="submit" class="btn btn-primary">Add Chapter</button>
-      </div>
-    </form>
+  <div class="container py-5 d-flex justify-content-center">
+    <div class="card shadow-lg p-4 w-100" style="max-width: 500px;">
+      <h3 class="card-title text-center mb-4">📘 Add New Chapter</h3>
+      <form @submit.prevent="addChapter">
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold">Chapter Name</label>
+          <input
+            v-model="newChapter.name"
+            type="text"
+            class="form-control"
+            id="name"
+            placeholder="Enter chapter name"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label fw-semibold">Description</label>
+          <textarea
+            v-model="newChapter.description"
+            class="form-control"
+            id="description"
+            placeholder="Enter chapter description"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            ➕ Add Chapter
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -46,29 +53,25 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'authorization':'Bearer ' + localStorage.getItem('admin_token')
+          'authorization': 'Bearer ' + localStorage.getItem('admin_token')
         },
         body: JSON.stringify(this.newChapter),
       })
-      .then(response=> response.json())
-      .then(data=>{
+      .then(response => response.json())
+      .then(data => {
         alert(data.message);
         this.$router.push(`/manage_subject`);
-        });
+      });
     }
-        
   }
 }
 </script>
 
 <style scoped>
-.add-chapter-container {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  width: 100%;
-  max-width: 400px;
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0d6efd;
 }
+
 </style>

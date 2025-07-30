@@ -1,7 +1,8 @@
 from celery import Celery, Task
+from celery.schedules import crontab
 from flask import Flask
 
-# ✅ Celery Config Class
+# Celery Config Class
 class CeleryConfig:
     broker_url = 'redis://localhost:6379/0'
     result_backend = 'redis://localhost:6379/1'
@@ -10,11 +11,14 @@ class CeleryConfig:
     beat_schedule = {
         "add-every-10-seconds": {
             "task": "backend.task.daily_reminder",
-            "schedule": 10.0
+            "schedule": crontab(minute='*/1'), 
         },
+         'send-monthly-report': {
+        'task': 'backend.task.send_monthly_report',
+        'schedule': crontab(minute='*/1'),  
+    }
     }
 
-# ✅ FlaskTask must be defined at top-level (not inside a function)
 class FlaskTask(Task):
     def __call__(self, *args, **kwargs):
         if not hasattr(self, 'flask_app'):
@@ -22,11 +26,10 @@ class FlaskTask(Task):
         with self.flask_app.app_context():
             return self.run(*args, **kwargs)
 
-# ✅ Celery init function
 def celery_init_app(app: Flask) -> Celery:
     celery_app = Celery(app.name, task_cls=FlaskTask)
     celery_app.config_from_object(CeleryConfig)
     celery_app.set_default()
-    celery_app.Task.flask_app = app  # attach Flask app to task
+    celery_app.Task.flask_app = app  
     app.extensions["celery"] = celery_app
     return celery_app

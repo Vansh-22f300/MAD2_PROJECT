@@ -2,6 +2,20 @@
 <html>
 <head>
     <title>Monthly Report</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <h1>Monthly Report for {{ username }} - {{ month }}</h1>
@@ -9,7 +23,7 @@
     <p>Your average percentage this month is {{ avg_percentage }}.</p>
     <table>
         <tr>
-            <th>Quiz Title</th>
+            <th>Quiz-Title</th>
             <th>Marks Obtained</th>
             <th>Total Marks</th>
             <th>Percentage</th>
@@ -17,11 +31,12 @@
         {% for score in quiz_details %}
         <tr>
             <td>{{ score.quiz.title }}</td>
-            <td>{{ score.marks_obtained }}</td>
-            <td>{{ score.total_marks }}</td>
+            <td>{{ score.score }}</td>
+            <td>{{ score.total_possible_marks }}</td>
             <td>{{ score.percentage }}%</td>
         </tr>
         {% endfor %}
     </table>
 </body>
 </html>
+
