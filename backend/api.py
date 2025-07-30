@@ -63,19 +63,14 @@ class AddSubject(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        if current_user != 'admin':
+        if current_user!= 'admin':
             return {'message': 'Access forbidden: Admins only'}, 403
-
-        cached_subjects = cache.get('admin_subjects_with_chapters')
-        if cached_subjects:
-            print("✅ Returned from cache")
-            return cached_subjects, 200
-
-        print("🚨 Cache miss — Fetching from DB")
+            
+        
         subjects = Subject.query.all()
         sub_json = []
         for subject in subjects:
-            chapters = Chapter.query.filter_by(subject_id=subject.id).all()
+            chapters=Chapter.query.filter_by(subject_id=subject.id).all()
             chapter_json = []
             for chapter in chapters:
                 chapter_json.append({
@@ -91,69 +86,57 @@ class AddSubject(Resource):
                 'description': subject.description,
                 'chapters': chapter_json
             })
-
-        # ✅ Store result in Redis cache
-        cache.set('admin_subjects_with_chapters', sub_json, timeout=300)  # 5 min
         return sub_json, 200
-@jwt_required()
-def post(self):
-    current_user = get_jwt_identity()
-    if current_user != 'admin':
-        return {'message': 'Access forbidden: Admins only'}, 403
+    
+    @jwt_required()
+    def post(self):
+        current_user = get_jwt_identity()
+        if current_user!= 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 403
+        
+        data = request.get_json()
+        subject = Subject(
+            name=data['name'],
+            code=data['code'],
+            credits=data['credits'],
+            description=data.get('description', '')
+        )
+        db.session.add(subject)
+        db.session.commit()
+        
+        return {'message': 'Subject added successfully'}, 200
+    
+    @jwt_required()
+    def put(self,sub_id):
+        current_user = get_jwt_identity()
+        if current_user!= 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 403
+        
+        data = request.get_json()
+        subject = Subject.query.get(sub_id)
+        if not subject:
+            return {'message': 'Subject not found'}, 404
+        
+        subject.name = data['name']
+        subject.code = data['code']
+        subject.credits = data['credits']
+        subject.description = data.get('description', '')
+        db.session.commit()
+        return {'message': 'Subject updated successfully'}, 200       
+    
+    @jwt_required()
+    def delete(self, sub_id):
+        current_user = get_jwt_identity()
+        if current_user != 'admin':
+            return {'message': 'Access forbidden: Admins only'}, 403
 
-    data = request.get_json()
-    subject = Subject(
-        name=data['name'],
-        code=data['code'],
-        credits=data['credits'],
-        description=data.get('description', '')
-    )
-    db.session.add(subject)
-    db.session.commit()
+        subject = Subject.query.get(sub_id)
+        if not subject:
+            return {'message': 'Subject not found'}, 404
 
-    cache.delete('admin_subjects_with_chapters')  # 🔁 Invalidate cache
-
-    return {'message': 'Subject added successfully'}, 200
-
-
-@jwt_required()
-def put(self, sub_id):
-    current_user = get_jwt_identity()
-    if current_user != 'admin':
-        return {'message': 'Access forbidden: Admins only'}, 403
-
-    data = request.get_json()
-    subject = Subject.query.get(sub_id)
-    if not subject:
-        return {'message': 'Subject not found'}, 404
-
-    subject.name = data['name']
-    subject.code = data['code']
-    subject.credits = data['credits']
-    subject.description = data.get('description', '')
-    db.session.commit()
-
-    cache.delete('admin_subjects_with_chapters')  # 🔁 Invalidate cache
-
-    return {'message': 'Subject updated successfully'}, 200
-
-
-@jwt_required()
-def delete(self, sub_id):
-    current_user = get_jwt_identity()
-    if current_user != 'admin':
-        return {'message': 'Access forbidden: Admins only'}, 403
-
-    subject = Subject.query.get(sub_id)
-    if not subject:
-        return {'message': 'Subject not found'}, 404
-
-    db.session.delete(subject)
-    db.session.commit()
-
-    cache.delete('admin_subjects_with_chapters')  # 🔁 Invalidate cache
-
-    return {'message': 'Subject deleted successfully'}, 200
+        db.session.delete(subject)
+        db.session.commit()
+        return {'message': 'Subject deleted successfully'}, 200
 
     
 class AddChapter(Resource):
@@ -606,7 +589,15 @@ class Admin_Summary(Resource):
         if current_user != 'admin':
             return {'message': 'Access forbidden: Admins only'}, 401
 
-        # Corrected Query for Pie Chart: Subject-wise attempts
+        # Check cache
+        cached_summary = cache.get('admin_summary_dashboard')
+        if cached_summary:
+            print("✅ Returned Admin Summary from cache")
+            return cached_summary, 200
+
+        print("🚨 Cache miss — Calculating Admin Summary")
+
+        # 🚀 Pie Chart Data: Subject-wise attempts
         subject_attempts = db.session.query(
             Subject.name,
             db.func.count(Score.id)
@@ -631,13 +622,18 @@ class Admin_Summary(Resource):
         bar_labels = [row[0] for row in top_score]
         bar_data = [row[1] for row in top_score]
 
-        return {
+       
+        result = {
             'pie_labels': pie_labels,
             'pie_data': pie_data,
             'bar_labels': bar_labels,
             'bar_data': bar_data
-        }, 200
-        
+        }
+
+        # Cache result for 1 minutes (60 seconds)
+        cache.set('admin_summary_dashboard', result, timeout=60)
+
+        return result, 200      
 class Admin_Users(Resource):
     @jwt_required()
     def get(self):

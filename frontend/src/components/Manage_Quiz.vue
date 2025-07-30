@@ -334,7 +334,6 @@ export default {
       })
       .catch(error => {
         console.error('Error deleting quiz:', error);
-        // this.showMessage('Error', 'Failed to delete quiz: ' + error.message); // Original showMessage commented out
       });
     },
     fetchChapters() {
@@ -354,27 +353,20 @@ export default {
         console.error('Error fetching chapters:', error);
       });
     },
-    // CHANGE 6: Method to open the Add Question modal
     openAddQuestionModal(quizId) {
       this.selectedQuizIdForQuestion = quizId; // Set the quiz ID to pass to the modal
-      // Use nextTick to ensure the prop has updated before showing the modal
       this.$nextTick(() => {
-        // Use the specific ID of the Add Question modal defined in addquestion.vue
         const addQuestionModalInstance = new bootstrap.Modal(document.getElementById('addQuestionModal'));
         addQuestionModalInstance.show();
       });
     },
-    // CHANGE 7: Handler for the 'question-added' event from the Add_Question component
     handleQuestionAdded(message) {
       alert(message); // Display the message received from the modal
       this.fetchQuizzes(); // Refresh the quiz list, perhaps to update question count
-      // Hide the Add Question modal
       const addQuestionModalInstance = bootstrap.Modal.getInstance(document.getElementById('addQuestionModal'));
       if (addQuestionModalInstance) {
         addQuestionModalInstance.hide();
       }
-      // Optionally reset the selectedQuizIdForQuestion after the modal is hidden
-      // This is good practice to ensure modal state is clean for next open
       this.selectedQuizIdForQuestion = null; 
     },
     async getAdminName() {
