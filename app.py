@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
