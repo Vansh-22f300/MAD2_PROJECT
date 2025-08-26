@@ -25,7 +25,7 @@ from backend.worker import *
 
 from backend.task import *
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="../frontend/dist")
     app.config.from_object('backend.config.LocalConfig')
     db.init_app(app)
     cache.init_app(app)
