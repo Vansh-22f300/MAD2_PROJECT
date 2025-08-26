@@ -28,7 +28,7 @@ def admin_setup():
         admin = User(
             username='admin',
             email='admin@gmail.com',
-            password=bcrypt.hash('admin'),
+            password=bcrypt.hash('vm123'),
             dob=datetime.strptime('2000-01-01', '%Y-%m-%d').date(),
             full_name='Admin User',
             Is_admin=True,
