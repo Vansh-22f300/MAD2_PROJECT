@@ -89,7 +89,14 @@ api.add_resource(Admin_Summary, '/admin_summary')
 api.add_resource(Admin_Users, '/admin_users')
 api.add_resource(Admin_Profile, '/admin/profile')
 api.add_resource(User_Profile, '/user/profile')
-
+# Catch-all: serve frontend
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_vue(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, "index.html")
 # celery -A app.celery worker --loglevel=info --pool=solo
 # celery -A app.celery beat --loglevel=info
 # c drive
