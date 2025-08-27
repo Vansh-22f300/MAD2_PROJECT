@@ -518,7 +518,7 @@ class Start_Quiz(Resource):
                     score += 1
         
         percentage = (score / total_possible_marks) * 100 if total_possible_marks > 0 else 0
-        grade = 'Excellent' if percentage >= 75 else 'Need to Improve'
+        grade = 'Excellent' if percentage >= 75 else 'Improve'
         timestamp = datetime.now()
         
         new_score = Score(
