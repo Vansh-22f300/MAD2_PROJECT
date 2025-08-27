@@ -242,7 +242,7 @@ export default {
     },
     async addSubject() {
       try {
-        const response = await fetch('http://127.0.0.1:5000/add_subject/post', {
+        const response = await fetch('https://quiz-app-v2-py9b.onrender.com/add_subject/post', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -275,7 +275,7 @@ export default {
       }
     },
     fetchSubjects() {
-      fetch('http://127.0.0.1:5000/add_subject/get', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/add_subject/get', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
@@ -301,7 +301,7 @@ export default {
       modal.show();
     },
     editSubject() {
-      fetch(`http://127.0.0.1:5000/edit_subject/${this.selectedSubject.id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/edit_subject/${this.selectedSubject.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -327,7 +327,7 @@ export default {
     },
     deleteSubject(id){
       if (confirm('Are you sure you want to delete this subject?')) {
-      fetch(`http://127.0.0.1:5000/edit_subject/${id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/edit_subject/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
@@ -352,7 +352,7 @@ export default {
       modal.show();
     },
     editChapter() {
-      fetch(`http://127.0.0.1:5000/edit_chapter/${this.selectedChapter.id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/edit_chapter/${this.selectedChapter.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -376,7 +376,7 @@ export default {
     },
     deleteChapter(id){
       if (confirm('Are you sure you want to delete this chapter?')) {
-      fetch(`http://127.0.0.1:5000/delete_chapter/${id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/delete_chapter/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('admin_token')
@@ -395,7 +395,7 @@ export default {
     },
     async getAdminName() {
     try {
-      const res = await fetch('http://127.0.0.1:5000/admin/profile', {
+      const res = await fetch('https://quiz-app-v2-py9b.onrender.com/admin/profile', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('admin_token')

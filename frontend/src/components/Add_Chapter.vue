@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     addChapter() {
-      fetch(`http://127.0.0.1:5000/add_chapter/${this.$route.params.subject_id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/add_chapter/${this.$route.params.subject_id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

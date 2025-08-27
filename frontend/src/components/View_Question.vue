@@ -133,7 +133,7 @@ export default {
         
     },
     editQuestion(){
-      fetch(`http://127.0.0.1:5000/edit_question/${this.SelectedQuestion.id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/edit_question/${this.SelectedQuestion.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export default {
     },
 
     fetchQuestions() {
-    fetch(`http://127.0.0.1:5000/get_questions/${this.$route.params.quiz_id}`, {
+    fetch(`https://quiz-app-v2-py9b.onrender.com/get_questions/${this.$route.params.quiz_id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -171,7 +171,7 @@ export default {
       if (!confirm("Are you sure you want to delete this question?")) {
         return;
       }
-      fetch(`http://127.0.0.1:5000/delete_question/${id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/delete_question/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

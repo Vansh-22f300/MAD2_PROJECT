@@ -259,7 +259,7 @@ export default {
       bootstrap.Modal.getOrCreateInstance(document.getElementById('editQuizModal')).show();
     },
     editQuiz() {
-      fetch(`http://127.0.0.1:5000/edit_quiz/${this.SelectedQuiz.id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/edit_quiz/${this.SelectedQuiz.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -278,7 +278,7 @@ export default {
       });
     },
     fetchQuizzes() {
-      fetch('http://127.0.0.1:5000/get_quiz', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/get_quiz', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ export default {
       });
     },
     addQuiz() {
-      fetch('http://127.0.0.1:5000/add_quiz', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/add_quiz', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ export default {
       if (!confirm("Are you sure you want to delete this quiz?")) {
         return;
       }
-      fetch(`http://127.0.0.1:5000/delete_quiz/${id}`, {
+      fetch(`https://quiz-app-v2-py9b.onrender.com/delete_quiz/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ export default {
       });
     },
     fetchChapters() {
-      fetch('http://127.0.0.1:5000/add_chapter/get', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/add_chapter/get', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ export default {
     },
     async getAdminName() {
     try {
-      const res = await fetch('http://127.0.0.1:5000/admin/profile', {
+      const res = await fetch('https://quiz-app-v2-py9b.onrender.com/admin/profile', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('admin_token')

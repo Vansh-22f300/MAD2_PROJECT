@@ -106,7 +106,7 @@ export default {
   },
   methods: {
     fetchScores() {
-      fetch('http://127.0.0.1:5000/user_results', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/user_results', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export default {
       });
     },
     fetchUsername() {
-      fetch('http://127.0.0.1:5000/user/profile', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/user/profile', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('user_token')
@@ -137,7 +137,7 @@ export default {
       });
     },
     exportCSV() {
-      fetch('http://127.0.0.1:5000/export_details', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/export_details', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('user_token')

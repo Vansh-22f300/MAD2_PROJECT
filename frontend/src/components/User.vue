@@ -83,7 +83,7 @@ export default {
   },
   methods: {
     fetchQuizzes() {
-      fetch('http://127.0.0.1:5000/get_quiz', {
+      fetch('https://quiz-app-v2-py9b.onrender.com/get_quiz', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export default {
     },
     async getUsername() {
     try {
-      const res = await fetch('http://127.0.0.1:5000/user/profile', {
+      const res = await fetch('https://quiz-app-v2-py9b.onrender.com/user/profile', {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('user_token')

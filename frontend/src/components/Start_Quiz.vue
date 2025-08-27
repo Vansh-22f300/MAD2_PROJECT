@@ -144,7 +144,7 @@ export default {
     },
     methods:{
       async loadQuiz(){
-        const response = await fetch(`http://127.0.0.1:5000/start_quiz/${this.$route.params.quiz_id}`, {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/start_quiz/${this.$route.params.quiz_id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -211,7 +211,7 @@ export default {
           answers: this.prepareAnswers(),
         };
 
-        const response = await fetch(`http://127.0.0.1:5000/start_quiz/${this.$route.params.quiz_id}`, {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/start_quiz/${this.$route.params.quiz_id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

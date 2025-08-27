@@ -115,7 +115,7 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/admin_users`, {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/admin_users`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

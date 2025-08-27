@@ -105,7 +105,7 @@ export default {
     });
 
     onMounted(async () => {
-      const response = await fetch('http://127.0.0.1:5000/admin_summary', {
+      const response = await fetch('https://quiz-app-v2-py9b.onrender.com/admin_summary', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

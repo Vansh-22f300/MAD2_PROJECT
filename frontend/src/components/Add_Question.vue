@@ -83,7 +83,7 @@ export default {
   },
   methods: {
     async addQuestion() { 
-      const url = `http://127.0.0.1:5000/add_question/${this.quizId}`;
+      const url = `https://quiz-app-v2-py9b.onrender.com/add_question/${this.quizId}`;
       const token = localStorage.getItem('admin_token');
 
       if (!token) {
