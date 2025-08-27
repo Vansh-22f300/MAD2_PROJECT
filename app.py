@@ -67,7 +67,7 @@ def send_test_email():
         msg = Message(
             subject="Hello from Flask on Render!",
             # The sender is automatically read from your app's config
-            recipients=["your-real-email@gmail.com"] # <-- CHANGE THIS to your email
+            recipients=["vanshmittal021@gmail.com"] # <-- CHANGE THIS to your email
         )
         msg.body = "This is a test email sent from your deployed Flask application."
         
