@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 from jinja2 import Template
+from flask import current_app
 import os, csv, smtplib
 
 
