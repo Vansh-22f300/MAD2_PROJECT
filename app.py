@@ -27,7 +27,16 @@ def create_app():
     else:
         app.config.from_object("backend.config.LocalConfig")
 
-   
+    print("--- MAIL DEBUG INFO ---")
+    print(f"MAIL_SERVER: {app.config.get('MAIL_SERVER')}")
+    print(f"MAIL_PORT: {app.config.get('MAIL_PORT')}")
+    print(f"MAIL_USE_TLS: {app.config.get('MAIL_USE_TLS')}")
+    print(f"MAIL_USERNAME: {app.config.get('MAIL_USERNAME')}")
+    # For security, let's only print the length of the password
+    password = app.config.get('MAIL_PASSWORD')
+    print(f"MAIL_PASSWORD LENGTH: {len(password) if password else 0}")
+    print("-----------------------")
+    # --------------------------
     mail.init_app(app)
     db.init_app(app)
     cache.init_app(app)
@@ -62,6 +71,13 @@ with app.app_context():
     admin_setup()
 @app.route("/send-test-email")
 def send_test_email():
+     # --- ADD THIS DEBUG BLOCK ---
+    print("--- SENDING TEST EMAIL ---")
+    print(f"Using Username: {app.config.get('MAIL_USERNAME')}")
+    password = app.config.get('MAIL_PASSWORD')
+    print(f"Using Password of Length: {len(password) if password else 0}")
+    print("--------------------------")
+    # ----
     try:
         # Create the message object
         msg = Message(
