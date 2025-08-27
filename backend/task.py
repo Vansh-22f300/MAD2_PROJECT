@@ -10,13 +10,6 @@ from flask import current_app
 import os, csv, smtplib
 
 
-# ------------ SMTP Config ------------
-SMTP_HOST = os.getenv("MAIL_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("MAIL_PORT", 587))
-SMTP_USER = os.getenv("MAIL_EMAIL", "your-email@gmail.com")
-SMTP_PASS = os.getenv("MAIL_PASSWORD", "your-app-password")
-SENDER_EMAIL = SMTP_USER
-
 
 # ------------ Mail Utility ------------
 def mail_config(to_address, subject, email_message, attachments=None):

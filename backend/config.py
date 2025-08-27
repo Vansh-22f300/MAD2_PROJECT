@@ -33,7 +33,7 @@ class LocalConfig(Config):
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    MAIL_USERNAME = os.getenv("MAIL_EMAIL", "your-email@gmail.com")
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME", "your-email@gmail.com")
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD", "your-app-password")
 
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_EMAIL", "your-email@gmail.com")
