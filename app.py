@@ -11,24 +11,47 @@ from backend.api import (
     AddQuestion, Export_Details, Start_Quiz, User_Results,
     Admin_Summary, Admin_Users, Admin_Profile, User_Profile
 )
-from backend.config import cache
-# from backend.worker import *   # optional
-# from backend.task import *     # optional
+from app import bcrypt
 
+from backend.config import cache
+from dotenv import load_dotenv
+load_dotenv()
+from flask_mail import Mail, Message
+mail=Mail()
 def create_app():
     app = Flask(__name__, static_folder="frontend/dist", template_folder="frontend/dist")
-    app.config.from_object('backend.config.LocalConfig')
+    
+    # Load config
+    if os.getenv("FLASK_ENV") == "production":
+        app.config.from_object("backend.config.ProductionConfig")
+    else:
+        app.config.from_object("backend.config.LocalConfig")
+
+    # Ensure DB URI is set from .env (Neon or SQLite fallback)
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    else:
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///quiz.db"  # fallback for local dev
+    
+    # Mail setup
+    app.config["MAIL_SERVER"] = "smtp.gmail.com"
+    app.config["MAIL_PORT"] = 587
+    app.config["MAIL_USE_TLS"] = True
+    app.config["MAIL_USERNAME"] = os.getenv("MAIL_EMAIL")
+    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+
+    mail.init_app(app)
     db.init_app(app)
     cache.init_app(app)
     return app
-
 def admin_setup():
     admin = User.query.filter_by(Is_admin=True).first()
     if not admin:
         admin = User(
             username='admin',
             email='admin@gmail.com',
-            password=bcrypt.hash('vm123'),
+            password=bcrypt.generate_password_hash('vm123').decode('utf-8'),
             dob=datetime.strptime('2000-01-01', '%Y-%m-%d').date(),
             full_name='Admin User',
             Is_admin=True,
@@ -50,6 +73,16 @@ with app.app_context():
     # celery = celery_init_app(app)  # optional
     db.create_all()
     admin_setup()
+@app.route("/send-test-email")
+def send_test_email():
+    try:
+        msg = Message("Hello from Flask",
+                      recipients=["your_friend_email@example.com"])
+        msg.body = "This is a test email sent from Flask using SMTP."
+        mail.send(msg)
+        return "✅ Test email sent successfully!"
+    except Exception as e:
+        return f"❌ Failed to send email: {str(e)}"
 
 # API routes
 api.add_resource(User_Login, '/login')
@@ -74,3 +107,8 @@ def serve_vue(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, "index.html")
+    
+ 
+    
+if __name__ == "__main__":
+    app.run(debug=True)
