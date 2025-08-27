@@ -157,20 +157,23 @@ export default {
 
         // Handle case where no questions are available
         if (data && data.questions && data.questions.length > 0) {
-            this.noQuestions = false;
-            this.Quiztitle = data.title;
-            this.timelimit = data.time_limit;
-            this.timeLeft = this.timelimit;
-            this.questions = data.questions.map(question => ({
-                id:question.id,
-                question_state: question.question_state,
-                options: [question.option_1, question.option_2, question.option_3, question.option_4]
-            }));
-        } else {
-            this.noQuestions = true;
-            console.error('No questions found for this quiz.');
-        }
-      },
+        this.noQuestions = false;
+        this.Quiztitle = data.title;
+        this.timelimit = data.time_limit;
+        this.timeLeft = this.timelimit;
+        this.questions = data.questions.map(question => ({
+            id: question.id,
+            question_state: question.question_state,
+            options: [question.option_1, question.option_2, question.option_3, question.option_4]
+        }));
+        
+        this.startCountdown(); // ADD THIS LINE HERE
+        
+    } else {
+        this.noQuestions = true;
+        console.error('No questions found for this quiz.');
+    }
+},
       getCorrectAnswerText(question) {
     const answerKey = question.correct_answer;
     
@@ -235,9 +238,8 @@ export default {
       }
     },
     mounted(){
-      this.username = localStorage.getItem('username') || 'User'; 
-      this.loadQuiz();
-      this.startCountdown();
+      this.username = localStorage.getItem('username') || 'User';
+      this.loadQuiz(); // Only load the quiz here
     }
 }
 </script>
