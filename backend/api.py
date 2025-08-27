@@ -589,14 +589,7 @@ class Admin_Summary(Resource):
         if current_user != 'admin':
             return {'message': 'Access forbidden: Admins only'}, 401
 
-        # Check cache
-        cached_summary = cache.get('admin_summary_dashboard')
-        if cached_summary:
-            print("✅ Returned Admin Summary from cache")
-            return cached_summary, 200
-
-        print("🚨 Cache miss — Calculating Admin Summary")
-
+    
         # 🚀 Pie Chart Data: Subject-wise attempts
         subject_attempts = db.session.query(
             Subject.name,
@@ -630,8 +623,6 @@ class Admin_Summary(Resource):
             'bar_data': bar_data
         }
 
-        # Cache result for 1 minutes (60 seconds)
-        cache.set('admin_summary_dashboard', result, timeout=60)
 
         return result, 200      
 class Admin_Users(Resource):
