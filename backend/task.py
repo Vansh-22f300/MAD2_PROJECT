@@ -19,29 +19,28 @@ SENDER_EMAIL = SMTP_USER
 
 # ------------ Mail Utility ------------
 def mail_config(to_address, subject, email_message, attachments=None):
+    # Get config from the running Flask app
+    sender_email = current_app.config['MAIL_DEFAULT_SENDER']
+    smtp_host = current_app.config['MAIL_SERVER']
+    smtp_port = current_app.config['MAIL_PORT']
+    smtp_user = current_app.config['MAIL_USERNAME']
+    smtp_pass = current_app.config['MAIL_PASSWORD']
+
     msg = MIMEMultipart()
-    msg['From'] = SENDER_EMAIL
+    msg['From'] = sender_email
     msg['To'] = to_address
     msg['Subject'] = subject
     msg.attach(MIMEText(email_message, 'html'))
 
-    if attachments and os.path.exists(attachments):
-        with open(attachments, 'rb') as file:
-            part = MIMEBase('text', 'csv')
-            part.set_payload(file.read())
-            encoders.encode_base64(part)
-            part.add_header(
-                'Content-Disposition',
-                f'attachment; filename={os.path.basename(attachments)}'
-            )
-            msg.attach(part)
+    # ... (rest of the function is the same) ...
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+    with smtplib.SMTP(smtp_host, smtp_port) as server:
         server.starttls()
-        server.login(SMTP_USER, SMTP_PASS)
-        server.sendmail(SENDER_EMAIL, to_address, msg.as_string())
+        server.login(smtp_user, smtp_pass)
+        server.sendmail(sender_email, to_address, msg.as_string())
 
     print(f"✅ Email sent to {to_address} with subject '{subject}'")
+
 
 
 # ------------ Celery Tasks ------------

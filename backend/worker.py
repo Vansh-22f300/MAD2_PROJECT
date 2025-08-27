@@ -2,23 +2,26 @@ from celery import Celery, Task
 from celery.schedules import crontab
 from flask import Flask
 
+import os # Add this import
 
 class CeleryConfig:
-    broker_url = 'redis://localhost:6379/0'
-    result_backend = 'redis://localhost:6379/1'
+    # Read the Redis URL from Render's environment variables
+    redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+    broker_url = f"{redis_url}/0"
+    result_backend = f"{redis_url}/1"
+
     timezone = "Asia/Kolkata"
     enable_utc = True
     beat_schedule = {
         "daily-reminder": {
             "task": "backend.task.daily_reminder",
-            "schedule": crontab(hour=9, minute=0),  # every day 9 AM
+            "schedule": crontab(hour=9, minute=0),
         },
         "monthly-report": {
             "task": "backend.task.send_monthly_report",
-            "schedule": crontab(day_of_month=1, hour=9, minute=0),  # 1st of every month
+            "schedule": crontab(day_of_month=1, hour=9, minute=0),
         }
     }
-
 
 class FlaskTask(Task):
     def __call__(self, *args, **kwargs):

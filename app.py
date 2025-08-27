@@ -21,26 +21,13 @@ mail=Mail()
 def create_app():
     app = Flask(__name__, static_folder="frontend/dist", template_folder="frontend/dist")
     
-    # Load config
+    # Load config (this already sets up your mail variables)
     if os.getenv("FLASK_ENV") == "production":
         app.config.from_object("backend.config.ProductionConfig")
     else:
         app.config.from_object("backend.config.LocalConfig")
 
-    # Ensure DB URI is set from .env (Neon or SQLite fallback)
-    db_url = os.getenv("DATABASE_URL")
-    if db_url:
-        app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-    else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///quiz.db"  # fallback for local dev
-    
-    # Mail setup
-    app.config["MAIL_SERVER"] = "smtp.gmail.com"
-    app.config["MAIL_PORT"] = 587
-    app.config["MAIL_USE_TLS"] = True
-    app.config["MAIL_USERNAME"] = os.getenv("MAIL_EMAIL")
-    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-
+   
     mail.init_app(app)
     db.init_app(app)
     cache.init_app(app)
@@ -76,12 +63,20 @@ with app.app_context():
 @app.route("/send-test-email")
 def send_test_email():
     try:
-        msg = Message("Hello from Flask",
-                      recipients=["your_friend_email@example.com"])
-        msg.body = "This is a test email sent from Flask using SMTP."
+        # Create the message object
+        msg = Message(
+            subject="Hello from Flask on Render!",
+            # The sender is automatically read from your app's config
+            recipients=["your-real-email@gmail.com"] # <-- CHANGE THIS to your email
+        )
+        msg.body = "This is a test email sent from your deployed Flask application."
+        
+        # Send the email
         mail.send(msg)
         return "✅ Test email sent successfully!"
     except Exception as e:
+        # This will print the exact error to your Render logs for debugging
+        print(f"Error sending email: {str(e)}")
         return f"❌ Failed to send email: {str(e)}"
 
 # API routes
