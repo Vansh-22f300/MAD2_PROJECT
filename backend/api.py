@@ -589,7 +589,7 @@ class Admin_Summary(Resource):
         if current_user != 'admin':
             return {'message': 'Access forbidden: Admins only'}, 401
 
-    
+        
         # 🚀 Pie Chart Data: Subject-wise attempts
         subject_attempts = db.session.query(
             Subject.name,
