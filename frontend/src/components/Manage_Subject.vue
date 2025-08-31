@@ -93,9 +93,100 @@
       </section>
     </main>
 
-    <div class="modal fade" id="addSubjectModal"></div>
-    <div class="modal fade" id="editSubjectModal"></div>
-    <div class="modal fade" id="editChapterModal"></div>
+     <!-- Add Subject Modal -->
+    <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="addSubjectModalLabel">Add New Subject</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="addSubject">
+              <div class="mb-3">
+                <label for="subjectName" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" id="subjectName" v-model="newSubject.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="subjectDescription" v-model="newSubject.description" required></textarea>
+              </div>
+              <div class="mb-3">
+              <label for="subjectCode" class="form-label">Code</label>
+              <input type="text" class="form-control" id="subjectCode" v-model="newSubject.code" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectCredits" class="form-label">Credits</label>
+                <input type="number" class="form-control" id="subjectCredits" v-model="newSubject.credits" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Add Subject</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Subject Modal -->
+    <div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editSubjectModalLabel">Edit Subject</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editSubject">
+              <div class="mb-3">
+                <label for="subjectName" class="form-label">Subject Name</label>
+                <input type="text" class="form-control" id="subjectName" v-model="selectedSubject.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="subjectDescription" v-model="selectedSubject.description" required></textarea>
+              </div>
+              <div class="mb-3">
+              <label for="subjectCode" class="form-label">Code</label>
+              <input type="text" class="form-control" id="subjectCode" v-model="selectedSubject.code" required>
+              </div>
+              <div class="mb-3">
+                <label for="subjectCredits" class="form-label">Credits</label>
+                <input type="number" class="form-control" id="subjectCredits" v-model="selectedSubject.credits" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Edit Subject</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Chapter Modal -->
+    <div class="modal fade" id="editChapterModal" tabindex="-1" aria-labelledby="editChapterModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="editChapterModalLabel">Edit Chapter</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editChapter">
+              <div class="mb-3">
+                <label for="chapterName" class="form-label">Chapter Name</label>
+                <input type="text" class="form-control" id="chapterName" v-model="selectedChapter.name" required>
+              </div>
+              <div class="mb-3">
+                <label for="chapterDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="chapterDescription" v-model="selectedChapter.description" required></textarea>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Edit Chapter</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="modal fade" id="addChapterModal" tabindex="-1" aria-labelledby="addChapterModalLabel" aria-hidden="true">
       <div class="modal-dialog">
