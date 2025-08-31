@@ -1,99 +1,75 @@
 <template>
-  <div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-      <div class="container-fluid">
-        <span class="navbar-text fw-bold text-white me-3 d-flex align-items-center">
-          <i class="fas fa-user-shield me-2"></i>Admin Dashboard
-        </span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <router-link class="nav-link active" to="/admin">
-                <i class="fas fa-home me-1"></i>Home
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin_summary">
-                <i class="fas fa-chart-line me-1"></i>Summary
-              </router-link>
-            </li>
-          </ul>
-          <form class="d-flex me-3">
-            <div class="input-group">
-              <input class="form-control form-control-sm" type="search" placeholder="Search users..." v-model="searchQuery" aria-label="Search" />
-              <button class="btn btn-light btn-sm" type="button">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </form>
-          <router-link to="/login" class="btn btn-outline-light btn-sm">
-            <i class="fas fa-sign-out-alt me-1"></i>Logout
-          </router-link>
-        </div>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">Admin Panel</small>
       </div>
-    </nav>
+      <nav class="sidebar-nav">
+        <router-link to="/admin" class="nav-link"><i class="fas fa-home me-2"></i>Home</router-link>
+        <router-link to="/admin_summary" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Summary</router-link>
+        <router-link to="/manage_quiz" class="nav-link"><i class="fas fa-clipboard-list me-2"></i>Manage Quizzes</router-link>
+        <router-link to="/admin_user" class="nav-link active"><i class="fas fa-users-cog me-2"></i>Manage Users</router-link>
+        <router-link to="/manage_subject" class="nav-link"><i class="fas fa-book me-2"></i>Manage Subjects</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50"><i class="fas fa-sign-out-alt me-2"></i>Logout</router-link>
+      </div>
+    </aside>
 
-    <div class="container py-5">
-      <div class="row justify-content-center">
-        <div class="col-md-9">
-          <div class="card shadow-lg border-0 rounded-3">
-            <div class="card-header bg-primary text-white text-center py-3 rounded-top-3">
-              <h4 class="mb-0">
-                <i class="fas fa-users me-2"></i>User Details
-              </h4>
-            </div>
+    <main class="main-content">
+      <header class="content-header">
+        <div>
+          <h2 class="fw-bold">User Management</h2>
+          <p class="text-muted">View and search for registered users.</p>
+        </div>
+        <div class="search-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input class="form-control" type="search" placeholder="Search users..." v-model="searchQuery" />
+        </div>
+      </header>
 
-            <div v-if="filteredUsers.length === 0" class="card-body text-center p-4">
-              <p class="lead text-muted">
-                <i class="fas fa-exclamation-circle me-1"></i>No users found.
-              </p>
-            </div>
-            <div v-else>
-              <div v-for="user in filteredUsers" :key="user.id" class="card-body border-bottom p-4">
-                <div class="d-flex align-items-start mb-3">
-                  <i class="fas fa-id-card fa-2x text-primary me-3"></i>
-                  <div>
-                    <h5 class="card-title mb-1">{{ user.full_name }}</h5>
-                    <span class="badge bg-secondary text-white">{{ user.username }}</span>
-                  </div>
-                </div>
-                <ul class="list-group list-group-flush mb-3">
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-envelope me-2 text-muted"></i>Email:</strong>
-                    <span>{{ user.email }}</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-birthday-cake me-2 text-muted"></i>Date of Birth:</strong>
-                    <span>{{ user.dob }}</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-venus-mars me-2 text-muted"></i>Gender:</strong>
-                    <span>{{ user.gender }}</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-phone me-2 text-muted"></i>Phone:</strong>
-                    <span>{{ user.phone }}</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-map-marker-alt me-2 text-muted"></i>Address:</strong>
-                    <span>{{ user.address }}</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong><i class="fas fa-user-graduate me-2 text-muted"></i>Qualification:</strong>
-                    <span>{{ user.qualification || 'N/A' }}</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+      <section class="mt-4">
+        <div class="data-card">
+          <div v-if="filteredUsers.length === 0" class="text-center p-5">
+            <i class="fas fa-exclamation-circle fa-2x text-muted mb-3"></i>
+            <p class="lead text-muted">No users found matching your search.</p>
+          </div>
+
+          <div class="table-responsive" v-else>
+            <table class="table modern-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Gender</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="user in filteredUsers" :key="user.id">
+                  <td>
+                    <div class="fw-bold">{{ user.full_name }}</div>
+                  </td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.phone }}</td>
+                  <td>
+                    <span class="badge status-badge" :class="user.gender === 'Male' ? 'male' : (user.gender === 'Female' ? 'female' : 'other')">
+                      {{ user.gender }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
+
 
 <script>
 export default {

@@ -1,117 +1,113 @@
 <template>
-  <div class="bg-light min-vh-100 d-flex flex-column">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4 py-2">
-      <span class="navbar-text text-white me-3">
-        <i class="fas fa-user-circle me-2"></i> Welcome, <strong>{{ username }}</strong>
-      </span>
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <router-link class="nav-link text-white" to="/user">
-            <i class="fas fa-home me-1"></i>Home
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link text-white" to="/user_results">
-            <i class="fas fa-chart-bar me-1"></i>User Results
-          </router-link>
-        </li>
-      </ul>
-      <router-link to="/login" class="btn btn-outline-light">
-        <i class="fas fa-sign-out-alt me-1"></i>Logout
-      </router-link>
-    </nav>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">User Dashboard</small>
+      </div>
+      <nav class="sidebar-nav">
+        <router-link to="/user" class="nav-link"><i class="fas fa-home me-2"></i>Home</router-link>
+        <router-link to="/user_results" class="nav-link"><i class="fas fa-chart-bar me-2"></i>My Results</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50"><i class="fas fa-sign-out-alt me-2"></i>Logout</router-link>
+      </div>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="container py-5 flex-grow-1">
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-
-          <!-- Header -->
-          <div class="text-center mb-4">
-            <h1 class="text-primary">
-              <i class="fas fa-pencil-alt me-2"></i>Start Quiz
-            </h1>
-            <p class="text-secondary">Good luck for your quiz!</p>
+    <main class="main-content">
+      <div v-if="!QuizSubmitted">
+        <header class="content-header">
+          <div>
+            <h2 class="fw-bold">{{ Quiztitle }}</h2>
+            <p class="text-muted">Read each question carefully. Good luck!</p>
           </div>
-
-          <!-- Timer -->
-          <div class="d-flex justify-content-center mb-4">
-            <div class="alert alert-info rounded-pill px-4 py-2 shadow-sm">
-              <i class="fas fa-clock me-2"></i>
-              <strong>Time Left:</strong> {{ formatTime }}
+        </header>
+        
+        <div class="quiz-layout-grid mt-4">
+          <div class="questions-panel">
+            <div class="data-card">
+              <form @submit.prevent="submitQuiz">
+                <div v-for="(question, index) in questions" :key="index" class="question-block">
+                  <h5 class="question-title">
+                    <span class="question-number">{{ index + 1 }}</span>
+                    {{ question.question_state }}
+                  </h5>
+                  <div class="options-group">
+                    <div v-for="(option, optionIndex) in question.options" :key="optionIndex" class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        :id="`q${index}-opt${optionIndex}`"
+                        :name="`question-${index}`"
+                        :value="option"
+                        v-model="useranswers[question.id]"
+                        :disabled="timeLeft <= 0"
+                      />
+                      <label class="form-check-label" :for="`q${index}-opt${optionIndex}`">
+                        {{ option }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
 
-          <!-- Quiz Questions -->
-          <div v-if="!QuizSubmitted" class="overflow-auto">
-            <form @submit.prevent="submitQuiz" class="card p-4 shadow-sm">
-              <div v-for="(question, index) in questions" :key="index" class="mb-4">
-                <h5 class="mb-3">
-                  {{ index + 1 }}. {{ question.question_state }}
-                </h5>
-                <div v-for="(option, optionIndex) in question.options" :key="optionIndex" class="form-check mb-2">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    :id="`q${index}-opt${optionIndex}`"
-                    :name="`question-${index}`"
-                    :value="option"
-                    v-model="useranswers[question.id]"
-                    :disabled="timeLeft <= 0"
-                  />
-                  <label class="form-check-label" :for="`q${index}-opt${optionIndex}`">
-                    {{ option }}
-                  </label>
-                </div>
+          <div class="quiz-info-panel">
+            <div class="data-card sticky-top" style="top: 2rem;">
+              <h5 class="fw-bold text-center">Quiz Status</h5>
+              <hr>
+              <div class="timer-display">
+                <i class="fas fa-clock me-2"></i>
+                <span>Time Left:</span>
+                <strong class="time-value">{{ formatTime }}</strong>
               </div>
-              <div class="text-end">
-                <button type="submit" class="btn btn-success">
-                  <i class="fas fa-paper-plane me-1"></i>Submit
+              <div class="progress my-4" style="height: 10px;">
+                <div class="progress-bar" role="progressbar" :style="{ width: progressPercentage + '%' }"></div>
+              </div>
+              <p class="text-center text-muted small">{{ answeredQuestions }} of {{ questions.length }} questions answered</p>
+              <div class="d-grid">
+                <button type="button" @click="submitQuiz" class="btn btn-success-custom btn-lg">
+                  <i class="fas fa-paper-plane me-2"></i>Submit Quiz
                 </button>
               </div>
-            </form>
-          </div>
-
-          <!-- Results Section -->
-          <div v-else class="card p-4 shadow-lg border-0 bg-white">
-            <h2 class="text-center text-primary fw-bold mb-4">
-              <i class="fas fa-book me-2"></i>{{ Quiztitle }}
-            </h2>
-            <h4 class="mb-3 text-secondary">
-              <i class="fas fa-chart-bar me-2"></i>Quiz Results
-            </h4>
-
-            <div v-for="(question, index) in questions" :key="index" class="mb-4">
-              <h5 class="fw-semibold text-dark">
-                {{ index + 1 }}. {{ question.question_state }}
-              </h5>
-              <div
-                :class="{
-                  'text-success': useranswers[question.id] === question.correct_answer,
-                  'text-danger': useranswers[question.id] !== question.correct_answer
-                }"
-                class="ps-3"
-              >
-                <p class="mb-1"><strong>Your Answer:</strong> {{ useranswers[question.id] || 'No Answer' }}</p>
-                <p><strong>Correct Answer:</strong> {{ getCorrectAnswerText(question) }}</p>
-              </div>
-              <hr />
-            </div>
-
-            <div class="text-center mt-4">
-              <router-link :to="`/user_results`" class="btn btn-outline-info px-4 me-2">
-                <i class="fas fa-eye me-2"></i>View Quiz Results
-              </router-link>
-              <router-link to="/user" class="btn btn-outline-primary px-4">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-              </router-link>
             </div>
           </div>
-
         </div>
       </div>
+
+      <div v-else>
+  <header class="content-header text-center">
+    <div>
+      <h2 class="fw-bold">Quiz Completed!</h2>
+      <p class="text-muted">Here's a summary of your results for "{{ Quiztitle }}"</p>
     </div>
+  </header>
+  <div class="results-summary-card mt-4">
+      <div v-for="(question, index) in questions" :key="index" class="result-item">
+          <div class="result-question">
+              <strong>{{ index + 1 }}.</strong> {{ question.question_state }}
+          </div>
+          
+          <div class="result-answer">
+              <span>Your Answer: {{ useranswers[question.id] || 'No Answer' }}</span>
+          </div>
+          
+          <div class="result-correct-answer">
+              <strong>Correct Answer:</strong> {{ getCorrectAnswerText(question) }}
+          </div>
+      </div>
+       <div class="text-center mt-4">
+          <router-link to="/user_results" class="btn btn-primary-custom px-4 me-2">
+              <i class="fas fa-eye me-2"></i>View All Results
+          </router-link>
+          <router-link to="/user" class="btn btn-outline-secondary px-4">
+              <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+          </router-link>
+      </div>
+  </div>
+</div>
+    </main>
   </div>
 </template>
 
@@ -140,6 +136,13 @@ export default {
         filteredQuizzes(){
             const subject= this.$route.params.subject;
             return this.quizzes.filter(quiz => quiz.subject === subject);
+        },
+        progressPercentage() {
+            if (!this.questions.length) return 0;
+            return (this.answeredQuestions / this.questions.length) * 100;
+        },
+        answeredQuestions() {
+            return Object.keys(this.useranswers).length;
         }
     },
     methods:{

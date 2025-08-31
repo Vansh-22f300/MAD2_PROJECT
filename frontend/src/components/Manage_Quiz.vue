@@ -1,77 +1,98 @@
-// managequiz.vue
-
 <template>
-  <div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-      <div class="container-fluid">
-        <span class="navbar-text fw-bold text-white me-3">
-          <i class="fas fa-user-circle me-2"></i>Welcome, {{ adminName }}
-        </span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <router-link class="nav-link active" to="/admin"><i class="fas fa-home me-1"></i>Home</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin_summary"><i class="fas fa-chart-bar me-1"></i>Summary</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/manage_subject"><i class="fas fa-clipboard-list me-1"></i>Manage Subjects</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin_user"><i class="fas fa-users-cog me-1"></i>Manage Users</router-link>
-            </li>
-          </ul>
-          <form class="d-flex me-3" @submit.prevent>
-            <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search..." v-model="searchQuery">
-              <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
-            </div>
-          </form>
-          <router-link to="/login" class="btn btn-outline-light"><i class="fas fa-sign-out-alt me-1"></i>Logout</router-link>
-        </div>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">Admin Panel</small>
       </div>
-    </nav>
+      <nav class="sidebar-nav">
+        <router-link to="/admin" class="nav-link"><i class="fas fa-home me-2"></i>Home</router-link>
+        <router-link to="/admin_summary" class="nav-link"><i class="fas fa-chart-bar me-2"></i>Summary</router-link>
+        <router-link to="/manage_quiz" class="nav-link active"><i class="fas fa-clipboard-list me-2"></i>Manage Quizzes</router-link>
+        <router-link to="/admin_user" class="nav-link"><i class="fas fa-users-cog me-2"></i>Manage Users</router-link>
+        <router-link to="/manage_subject" class="nav-link"><i class="fas fa-book me-2"></i>Manage Subjects</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50"><i class="fas fa-sign-out-alt me-2"></i>Logout</router-link>
+      </div>
+    </aside>
 
-    <div class="container mt-4 d-flex justify-content-end">
-      <button class="btn btn-primary" @click="AddQuizModal">
-        + Add New Quiz
-      </button>
-    </div>
+    <main class="main-content">
+      <header class="content-header">
+        <div>
+          <h2 class="fw-bold">Manage Quizzes</h2>
+          <p class="text-muted">Create, edit, and organize all quizzes.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="search-wrapper">
+              <i class="fas fa-search search-icon"></i>
+              <input class="form-control" type="search" placeholder="Search quizzes..." v-model="searchQuery" />
+            </div>
+            <button class="btn btn-primary-custom" @click="AddQuizModal">
+              <i class="fas fa-plus me-2"></i>Add Quiz
+            </button>
+        </div>
+      </header>
 
-    <div class="container mt-4">
-      <div class="row">
-        <div v-for="quiz in quizzes" :key="quiz.id" class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-              <h5 class="card-title">{{ quiz.name }}</h5>
-              <p class="card-text text-muted mb-1">📘 <strong>Subject:</strong> {{ quiz.subject_name }}</p>
-              <p class="card-text text-muted mb-1">📖 <strong>Chapter:</strong> {{ quiz.chapter_name }}</p>
-              <p class="card-text text-muted mb-1">🕒 <strong>Duration:</strong> {{ quiz.time_limit }} minutes</p>
-              <p class="card-text text-muted mb-1">🔒 <strong>Single Attempt:</strong> {{ quiz.single_attempt ? 'Yes' : 'No' }}</p>
-              <p class="card-text">{{ quiz.description }}</p>
-              <div class="d-flex justify-content-between mt-3">
-                <button class="btn btn-sm btn-primary me-2" @click="editQuizModal(quiz)">
-                  <i class="fas fa-edit me-1"></i>Edit
-                </button>
-                
-                <button class="btn btn-sm btn-danger" @click="deleteQuiz(quiz.id)">
-                  <i class="fas fa-trash me-1"></i>Delete
-                </button>
-              </div>
-            </div>
-            <div class="card-footer bg-white border-0 d-flex justify-content-between">
-              <button class="btn btn-sm btn-success" @click="openAddQuestionModal(quiz.id)">Add Question</button>
-              <router-link class="btn btn-sm btn-info text-white" :to="`/view_questions/${quiz.id}`">View Questions</router-link>
-            </div>
+      <section class="mt-4">
+        <div class="data-card">
+          <div v-if="!quizzes || quizzes.length === 0" class="text-center p-5">
+            <i class="fas fa-box-open fa-2x text-muted mb-3"></i>
+            <p class="lead text-muted">No quizzes have been created yet.</p>
+          </div>
+
+          <div class="table-responsive" v-else>
+            <table class="table modern-table">
+              <thead>
+                <tr>
+                  <th>Quiz Title</th>
+                  <th>Subject & Chapter</th>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th class="text-center">Questions</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="quiz in filteredQuizzes" :key="quiz.id">
+                  
+                  <td>
+                    <div class="fw-bold">{{ quiz.title }}</div>
+                    <small class="text-muted">{{ quiz.description }}</small>
+                  </td>
+                  <td>
+                    <div class="fw-bold">{{ quiz.subject_name }}</div>
+                    <small class="text-muted">{{ quiz.chapter_name }}</small>
+                  </td>
+                  <td>
+                    <span class="badge status-badge" :class="quiz.Is_active ? 'active' : 'inactive'">
+                      {{ quiz.Is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>{{ quiz.time_limit }} min</td>
+                  <td class="text-center">
+                      <button class="btn btn-sm btn-outline-info" @click="openViewQuestionsModal(quiz)">
+                      View
+                    </button>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-success me-2" @click="openAddQuestionModal(quiz.id)" title="Add Question">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary me-2" @click="editQuizModal(quiz)" title="Edit Quiz">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" @click="deleteQuiz(quiz.id)" title="Delete Quiz">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-    </div>
-
+      </section>
+    </main>
     <div class="modal fade" id="addQuizModal" tabindex="-1" aria-labelledby="addQuizModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content shadow">
@@ -181,6 +202,107 @@
     <Add_Question v-if="selectedQuizIdForQuestion" 
                   :quiz-id="selectedQuizIdForQuestion" 
                   @question-added="handleQuestionAdded" />
+    <div class="modal fade" id="viewQuestionsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-list-ol me-2"></i>Questions for "{{ selectedQuizForView ? selectedQuizForView.title : '' }}"
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div v-if="loadingQuestions" class="text-center p-5">
+          <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+        </div>
+        <div v-else-if="viewedQuestions.length === 0" class="alert alert-info">
+          No questions have been added to this quiz yet.
+        </div>
+        <ul class="list-group list-group-flush question-list" v-else>
+          <li v-for="(question, index) in viewedQuestions" :key="question.id" class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-bold mb-2">{{ index + 1 }}. {{ question.question_state }}</div>
+                <ul class="list-unstyled ps-3 options-list">
+                  <li :class="{ 'correct-answer': 'option_1' === question.correct_answer }">
+                    <i class="fas me-2" :class="'option_1' === question.correct_answer ? 'fa-check-circle' : 'fa-circle'"></i>
+                    {{ question.option_1 }}
+                  </li>
+                  <li :class="{ 'correct-answer': 'option_2' === question.correct_answer }">
+                    <i class="fas me-2" :class="'option_2' === question.correct_answer ? 'fa-check-circle' : 'fa-circle'"></i>
+                    {{ question.option_2 }}
+                  </li>
+                  <li :class="{ 'correct-answer': 'option_3' === question.correct_answer }">
+                    <i class="fas me-2" :class="'option_3' === question.correct_answer ? 'fa-check-circle' : 'fa-circle'"></i>
+                    {{ question.option_3 }}
+                  </li>
+                  <li :class="{ 'correct-answer': 'option_4' === question.correct_answer }">
+                    <i class="fas me-2" :class="'option_4' === question.correct_answer ? 'fa-check-circle' : 'fa-circle'"></i>
+                    {{ question.option_4 }}
+                  </li>
+                </ul>
+              </div>
+              <div class="d-flex gap-2 flex-shrink-0 ms-3">
+                <button class="btn btn-sm btn-outline-primary" @click="openEditQuestionModal(question)">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" @click="deleteQuestionFromModal(question.id)">Delete</button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Edit Question Modal -->
+    <div class="modal fade" id="editQuestionModal" tabindex="-1" aria-labelledby="editQuestionModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editQuestionModalLabel">Edit Question</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form @submit.prevent="editQuestion">
+              <div class="mb-3">
+                <label for="question_tag" class="form-label">Question Tag</label>
+                <input type="text" class="form-control" id="question_tag" v-model="SelectedQuestion.question_tag" />
+              </div>
+              <div class="mb-3">
+                <label for="question_state" class="form-label">Question Statement</label>
+                <textarea class="form-control" id="question_state" rows="3" v-model="SelectedQuestion.question_state"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="option_1" class="form-label">Option 1</label>
+                <input type="text" class="form-control" id="option_1" v-model="SelectedQuestion.option_1" />
+              </div>
+              <div class="mb-3">
+                <label for="option_2" class="form-label">Option 2</label>
+                <input type="text" class="form-control" id="option_2" v-model="SelectedQuestion.option_2" />
+              </div>
+              <div class="mb-3">
+                <label for="option_3" class="form-label">Option 3</label>
+                <input type="text" class="form-control" id="option_3" v-model="SelectedQuestion.option_3" />
+              </div>
+              <div class="mb-3">
+                <label for="option_4" class="form-label">Option 4</label>
+                <input type="text" class="form-control" id="option_4" v-model="SelectedQuestion.option_4" />
+              </div>
+              <div class="mb-3">
+                <label for="correct_answer" class="form-label">Correct Answer</label>
+                <select class="form-select" id="correct_answer" v-model="SelectedQuestion.correct_answer">
+                  <option value="">Select Correct Option</option>
+                  <option value="option_1">{{ SelectedQuestion.option_1 || 'Option 1' }}</option>
+                  <option value="option_2">{{ SelectedQuestion.option_2 || 'Option 2' }}</option>
+                  <option value="option_3">{{ SelectedQuestion.option_3 || 'Option 3' }}</option>
+                  <option value="option_4">{{ SelectedQuestion.option_4 || 'Option 4' }}</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>              
   </div>
 </template>
 
@@ -221,16 +343,34 @@ export default {
         single_attempt: false
       },
       // CHANGE 5: New data property to store the quiz ID for the Add Question modal
-      selectedQuizIdForQuestion: null 
+      selectedQuizIdForQuestion: null ,
+      // Data for View/Edit Questions Modal
+      viewQuestionsModalInstance: null,
+      editQuestionModalInstance: null,
+      selectedQuizForView: null,
+      viewedQuestions: [],
+      loadingQuestions: false,
+      SelectedQuestion: {},
     };
   },
   computed: {
-    filtered_Quizzes() {
-      const query = this.quizSearch ? this.quizSearch.toLowerCase() : '';
-      return this.quizzes.filter(quiz =>
-        (quiz.name && quiz.name.toLowerCase().includes(query)) ||
-        (quiz.subject_name && quiz.subject_name.toLowerCase().includes(query))
-      );
+    // --- THIS IS THE UPDATED SEARCH LOGIC ---
+    filteredQuizzes() {
+      // If there's no search query, return all quizzes
+      if (!this.searchQuery) {
+        return this.quizzes;
+      }
+      
+      const query = this.searchQuery.toLowerCase().trim();
+      
+      return this.quizzes.filter(quiz => {
+        // Check for matches in quiz name, subject name, or chapter name
+        const quizNameMatch = quiz.title && quiz.title.toLowerCase().includes(query);
+        const subjectNameMatch = quiz.subject_name && quiz.subject_name.toLowerCase().includes(query);
+        const chapterNameMatch = quiz.chapter_name && quiz.chapter_name.toLowerCase().includes(query);
+        
+        return quizNameMatch || subjectNameMatch || chapterNameMatch;
+      });
     }
   },
   methods: {
@@ -252,7 +392,6 @@ export default {
       this.SelectedQuiz.title = quiz.title;
       this.SelectedQuiz.description = quiz.description;
       this.SelectedQuiz.time_limit = quiz.time_limit;
-      // Ensure date is formatted for input type="date"
       this.SelectedQuiz.date = quiz.date ? new Date(quiz.date).toISOString().split('T')[0] : '';
       this.SelectedQuiz.Is_active = typeof quiz.Is_active === 'string' ? (quiz.Is_active === 'true') : !!quiz.Is_active;
       this.SelectedQuiz.single_attempt = !!quiz.single_attempt;
@@ -369,6 +508,62 @@ export default {
       }
       this.selectedQuizIdForQuestion = null; 
     },
+    openViewQuestionsModal(quiz) {
+      this.selectedQuizForView = quiz;
+      this.fetchQuestionsForModal(quiz.id);
+      this.viewQuestionsModalInstance.show();
+    },
+    async fetchQuestionsForModal(quizId) {
+      this.loadingQuestions = true;
+      try {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/get_questions/${quizId}`, {
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('admin_token') }
+        });
+        const data = await response.json();
+        this.viewedQuestions = data.questions || [];
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      } finally {
+        this.loadingQuestions = false;
+      }
+    },
+    openEditQuestionModal(question) {
+      this.SelectedQuestion = { ...question };
+      this.editQuestionModalInstance.show();
+    },
+    async editQuestion() {
+      try {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/edit_question/${this.SelectedQuestion.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "Authorization": 'Bearer ' + localStorage.getItem('admin_token') },
+          body: JSON.stringify(this.SelectedQuestion)
+        });
+        const data = await response.json();
+        alert(data.message);
+        if (response.ok) {
+          this.editQuestionModalInstance.hide();
+          this.fetchQuestionsForModal(this.selectedQuizForView.id); // Refresh the list
+        }
+      } catch (error) {
+        console.error("Error editing question:", error);
+      }
+    },
+    async deleteQuestionFromModal(questionId) {
+      if (!confirm("Are you sure?")) return;
+      try {
+        const response = await fetch(`https://quiz-app-v2-py9b.onrender.com/delete_question/${questionId}`, {
+          method: "DELETE",
+          headers: { 'Authorization': 'Bearer ' + localStorage.getItem('admin_token') }
+        });
+        const data = await response.json();
+        alert(data.message);
+        if (response.ok) {
+          this.fetchQuestionsForModal(this.selectedQuizForView.id); // Refresh the list
+        }
+      } catch (error) {
+        console.error("Error deleting question:", error);
+      }
+    },
     async getAdminName() {
     try {
       const res = await fetch('https://quiz-app-v2-py9b.onrender.com/admin/profile', {
@@ -392,6 +587,8 @@ export default {
     this.fetchQuizzes();
     this.fetchChapters();
     this.getAdminName();
+    this.viewQuestionsModalInstance = new bootstrap.Modal(document.getElementById('viewQuestionsModal'));
+    this.editQuestionModalInstance = new bootstrap.Modal(document.getElementById('editQuestionModal'));
     
   }
 }

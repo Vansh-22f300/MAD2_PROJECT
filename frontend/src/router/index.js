@@ -6,7 +6,7 @@ import Signup from '@/components/Signup.vue'
 import Manage_Subject from '@/components/Manage_Subject.vue'
 import Add_Chapter from '@/components/Add_Chapter.vue'
 import Manage_Quiz from '@/components/Manage_Quiz.vue'
-import View_Question from '@/components/View_Question.vue'
+// import View_Question from '@/components/View_Question.vue'
 import User from '@/components/User.vue'
 import Start_Quiz from '@/components/Start_Quiz.vue'
 import User_Results from '@/components/User_Results.vue'
@@ -50,11 +50,11 @@ const router = createRouter({
       name: 'manage_quiz',
       component: Manage_Quiz,
     },
-    {
-      path: '/view_questions/:quiz_id',
-      name: 'view_question',
-      component: View_Question,
-    },
+    // {
+    //   path: '/view_questions/:quiz_id',
+    //   name: 'view_question',
+    //   component: View_Question,
+    // },
     {
       path: '/user',
       name: 'user',

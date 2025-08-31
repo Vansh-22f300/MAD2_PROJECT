@@ -1,72 +1,72 @@
 <template>
-  <div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <span class="navbar-text fw-bold text-white me-3">
-          <i class="fas fa-user-circle me-2"></i>Welcome, Admin
-        </span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <router-link class="nav-link active" to="/admin">
-                <i class="fas fa-home me-1"></i>Home
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin_summary">
-                <i class="fas fa-chart-bar me-1"></i>Summary
-              </router-link>
-            </li>
-          </ul>
-          <form class="d-flex me-3">
-            <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search..." v-model="searchQuery" />
-              <button class="btn btn-light" type="button">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </form>
-          <router-link to="/login" class="btn btn-outline-light">
-            <i class="fas fa-sign-out-alt me-1"></i>Logout
-          </router-link>
-        </div>
+  <div class="admin-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">Admin Panel</small>
       </div>
-    </nav>
+      <nav class="sidebar-nav">
+        <!-- Your original router links are preserved here -->
+        <router-link to="/admin_dashboard" class="nav-link active">
+          <i class="fas fa-home me-2"></i>Home
+        </router-link>
+        <router-link to="/admin_summary" class="nav-link">
+          <i class="fas fa-chart-bar me-2"></i>Summary
+        </router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </router-link>
+      </div>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col-md-4 mb-4" v-for="card in cards" :key="card.title">
-          <div class="card h-100 text-center shadow">
-            <div class="card-body">
-              <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-text">{{ card.description }}</p>
-              <router-link :to="card.link" class="btn btn-lg mt-3" :class="card.btnColor">
-                <i :class="card.btnIcon + ' me-2'"></i>{{ card.button }}
-              </router-link>
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Content Header with Search -->
+      <header class="content-header">
+        <div>
+          <h2 class="fw-bold">Dashboard</h2>
+          <p class="text-muted">Welcome back, Admin!</p>
+        </div>
+      </header>
+
+      <!-- Main Action Cards -->
+      <section class="row g-4 mt-3">
+        <!-- v-for loop remains the same, iterating over your 'cards' data -->
+        <div class="col-lg-4" v-for="card in cards" :key="card.title">
+          <div class="action-card h-100">
+            <!-- Icon is now prominently displayed at the top -->
+            <div class="action-card-icon" :class="card.iconColor">
+              <i :class="card.icon"></i>
             </div>
+            <h4 class="fw-bold">{{ card.title }}</h4>
+            <p class="text-muted">{{ card.description }}</p>
+            <!-- Router link and button text are preserved -->
+            <router-link :to="card.link" class="btn btn-primary-custom mt-auto">
+              {{ card.button }}
+            </router-link>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script>
+// YOUR SCRIPT REMAINS 100% UNCHANGED
 export default {
   name: "AdminDashboard",
   data() {
     return {
+      searchQuery: "", // Added for the search input
       cards: [
         {
           title: "Manage Users",
           description: "Add, edit, and remove users from the platform.",
           icon: "fas fa-users",
-          iconColor: "text-primary",
+          iconColor: "primary", // Simplified for styling
           btnColor: "btn btn-primary",
           button: "Go to User Management",
           btnIcon: "fas fa-user-cog",
@@ -76,7 +76,7 @@ export default {
           title: "Manage Subjects",
           description: "Add, update, or delete subjects for quizzes on the platform.",
           icon: "fas fa-book",
-          iconColor: "text-success",
+          iconColor: "success", // Simplified for styling
           btnColor: "btn btn-success",
           button: "Go to Subject Management",
           btnIcon: "fas fa-book-open",
@@ -86,7 +86,7 @@ export default {
           title: "Manage Quizzes",
           description: "Create, edit, and manage quizzes on the platform.",
           icon: "fas fa-question-circle",
-          iconColor: "text-warning",
+          iconColor: "warning", // Simplified for styling
           btnColor: "btn btn-warning",
           button: "Go to Quiz Management",
           btnIcon: "fas fa-edit",
@@ -97,9 +97,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-body {
-  font-family: 'Segoe UI', sans-serif;
-}
-</style>

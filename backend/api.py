@@ -574,7 +574,7 @@ class User_Results(Resource):
                 'subject_name': score.subject.name,
                 'chapter_name': score.chapter.name,
                 'quiz_title': score.quiz.title,
-                'date_taken': score.date_taken.strftime('%Y-%m-%d %H:%M:%S'),
+                'date_taken': score.date_taken.strftime('%Y-%m-%d %I:%M:%S %p'),
                 'score': score.score,
                 'total_possible_marks': score.total_possible_marks,
                 'percentage': score.percentage,

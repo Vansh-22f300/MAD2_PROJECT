@@ -1,11 +1,12 @@
 <template>
-  <div class="login-container d-flex align-items-center justify-content-center min-vh-100 bg-light">
-    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
+  <div class="auth-container d-flex align-items-center justify-content-center">
+    <div class="auth-card shadow-lg p-4 p-sm-5">
       <div class="text-center mb-4">
-        <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
-        <h3 class="mt-2 fw-bold">Welcome Back</h3>
+        <i class="bi bi-shield-lock-fill brand-icon"></i>
+        <h3 class="mt-3 fw-bold">Welcome Back</h3>
         <p class="text-muted small">Login to continue your quiz journey</p>
       </div>
+      
       <form @submit.prevent="login">
         <div class="mb-3">
           <label for="username" class="form-label">Username</label>
@@ -18,6 +19,7 @@
             required
           />
         </div>
+        
         <div class="mb-4">
           <label for="password" class="form-label">Password</label>
           <input
@@ -29,15 +31,16 @@
             required
           />
         </div>
-        <button type="submit" class="btn btn-primary w-100">Login</button>
+        
+        <button type="submit" class="btn btn-primary-custom w-100 fw-semibold mt-2">Login</button>
       </form>
-      <div class="text-center mt-3">
+      
+      <div class="text-center mt-4">
         <small class="text-muted">Don't have an account? <router-link to="/signup">Sign Up</router-link></small>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {

@@ -1,70 +1,54 @@
 <template>
-  <div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <span class="navbar-text fw-bold text-white me-3">
-          <i class="fas fa-user-circle me-2"></i>Welcome, {{ adminName || 'Admin' }}
-        </span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin">
-                <i class="fas fa-home me-1"></i>Home
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link active" to="/admin_summary">
-                <i class="fas fa-chart-bar me-1"></i>Summary
-              </router-link>
-            </li>
-          </ul>
-          <form class="d-flex me-3">
-            <input class="form-control me-2" type="search" placeholder="Search..." />
-            <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
-          </form>
-          <router-link to="/login" class="btn btn-outline-light">
-            <i class="fas fa-sign-out-alt me-1"></i>Logout
-          </router-link>
-        </div>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">Admin Panel</small>
       </div>
-    </nav>
+      <nav class="sidebar-nav">
+        <router-link to="/admin" class="nav-link"><i class="fas fa-home me-2"></i>Home</router-link>
+        <router-link to="/admin_summary" class="nav-link active"><i class="fas fa-chart-bar me-2"></i>Summary</router-link>
+        <router-link to="/manage_quiz" class="nav-link"><i class="fas fa-clipboard-list me-2"></i>Manage Quizzes</router-link>
+        <router-link to="/admin_user" class="nav-link"><i class="fas fa-users-cog me-2"></i>Manage Users</router-link>
+        <router-link to="/manage_subject" class="nav-link"><i class="fas fa-book me-2"></i>Manage Subjects</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50"><i class="fas fa-sign-out-alt me-2"></i>Logout</router-link>
+      </div>
+    </aside>
 
-    <!-- Summary Content -->
-    <div class="container mt-5">
-      <div class="text-center mb-4">
-        <h1 class="display-5 text-primary">Admin Summary</h1>
-        <p class="text-muted">Overview of top scorers and subjects attempted</p>
-      </div>
-      <div class="row g-4 justify-content-center">
-        <div class="col-md-6">
-          <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white text-center">
-              <h5 class="mb-0">Top Scorer by Subject</h5>
+    <main class="main-content">
+      <header class="content-header">
+        <div>
+          <h2 class="fw-bold">Analytics Summary</h2>
+          <p class="text-muted">An overview of quiz performance and user engagement.</p>
+        </div>
+      </header>
+
+      <section class="mt-4">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="data-card h-100">
+              <h5 class="fw-bold mb-3 text-center">Top Scorer by Subject</h5>
+              <div class="chart-container">
+                <Bar :data="bardata" :options="baroptions" :key="chartKey" />
+              </div>
             </div>
-            <div class="card-body">
-              <Bar :data="bardata" :options="baroptions" :key="chartKey" />
+          </div>
+
+          <div class="col-lg-6">
+            <div class="data-card h-100">
+              <h5 class="fw-bold mb-3 text-center">Subject-wise User Attempts</h5>
+              <div class="chart-container">
+                <Pie :data="piedata" :options="pieoptions" :key="chartKey" />
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="card shadow-lg">
-            <div class="card-header bg-success text-white text-center">
-              <h5 class="mb-0">Subject-wise User Attempt</h5>
-            </div>
-            <div class="card-body">
-              <Pie :data="piedata" :options="pieoptions" :key="chartKey" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
-
 <script>
 import { ref, onMounted } from 'vue';
 import { Bar, Pie } from 'vue-chartjs';
@@ -88,19 +72,39 @@ export default {
     const bardata = ref({ labels: [], datasets: [] });
     const piedata = ref({ labels: [], datasets: [] });
 
+    // --- NEW, IMPROVED COLOR PALETTE ---
+    const primaryColor = '#4F46E5'; // Your primary brand color
+    const primaryColorTransparent = 'rgba(79, 70, 229, 0.2)';
+
+    // A modern, cohesive palette for the Pie chart
+    const pieChartColors = [
+      '#4F46E5', // Primary Indigo
+      '#34D399', // Emerald Green
+      '#FBBF24', // Amber Yellow
+      '#6366F1', // Lighter Indigo
+      '#FB7185', // Rose Pink
+      '#818CF8', // Lightest Indigo
+    ];
+
     const baroptions = ref({
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Top Scorer by Subject' },
+        legend: { display: false },
+        title: { display: false },
       },
+      scales: {
+        y: { grid: { color: '#e5e7eb' } },
+        x: { grid: { display: false } },
+      }
     });
 
     const pieoptions = ref({
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top' },
-        title: { display: true, text: 'Subject-wise User Attempt' },
+        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, pointStyle: 'circle' } },
+        title: { display: false },
       },
     });
 
@@ -114,36 +118,25 @@ export default {
       });
       const data = await response.json();
       if (response.ok) {
+        // Bar Chart Data (uses the clean primary color)
         bardata.value.labels = data.bar_labels;
         bardata.value.datasets = [{
           label: 'Score',
           data: data.bar_data,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1,
+          backgroundColor: primaryColorTransparent,
+          borderColor: primaryColor,
+          borderRadius: 4,
+          borderWidth: 2,
         }];
 
+        // Pie Chart Data (uses the new, better color palette)
         piedata.value.labels = data.pie_labels;
         piedata.value.datasets = [{
           label: 'Number of attempts',
           data: data.pie_data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)',
-          ],
-          borderWidth: 1,
+          backgroundColor: pieChartColors, // <-- UPDATED COLORS
+          borderColor: '#FFFFFF',
+          borderWidth: 2,
         }];
         chartKey.value++;
       } else {
@@ -155,11 +148,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.chart-container {
-  max-width: 100%;
-  height: 400px;
-  margin: 20px auto;
-}
-</style>

@@ -1,0 +1,726 @@
+/* --- src/assets/css/main.css --- */
+
+/* 1. FONT IMPORT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap');
+
+/* 2. CSS VARIABLES FOR THEME */
+:root {
+  --primary-color: #4F46E5; /* Indigo */
+  --accent-color: #14F195;  /* Neon Mint */
+  --text-dark: #1F2937;
+  --text-light: #6B7280;
+  --bg-light: #F9FAFB;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* 3. GLOBAL & BODY STYLES */
+body {
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background-color: var(--bg-light) !important; /* Use !important to override Bootstrap defaults */
+}
+
+h1, h2, h3, h4, h5, h6, .fw-bold, .fw-semibold {
+  font-family: var(--font-heading);
+  color: var(--text-dark);
+}
+
+/* 4. NAVBAR STYLES */
+.navbar {
+  transition: background-color 0.4s ease;
+}
+
+/* 5. HERO SECTION (Updated for a real photo) */
+.hero-section {
+  position: relative; /* Required for the overlay */
+  background-image: url('../images/hero-background.jpg'); /* Correct path to your image */
+  height: 90vh;
+  min-height: 700px;
+  background-size: cover;
+  background-position: center center;
+}
+
+/* Add this new rule for the overlay */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  z-index: 1;
+}
+
+/* Make sure the content is above the overlay */
+.hero-section .container {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-section .lead {
+  color: #d1d5db;
+}
+
+
+/* 6. CUSTOM BUTTONS */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+.btn-primary-custom:hover {
+  background-color: #4338CA; /* A darker shade */
+  border-color: #4338CA;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+.btn-accent-custom {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.8rem 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 20px rgba(20, 241, 149, 0.4);
+  transition: all 0.3s ease;
+}
+.btn-accent-custom:hover {
+  background-color: #00DDA2;
+  border-color: #00DDA2;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(20, 241, 149, 0.5);
+}
+
+/* 7. FEATURES SECTION */
+.feature-card {
+  background-color: #ffffffa0;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem; /* Softer, more modern corners */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(31, 41, 55, 0.1) !important;
+}
+
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-color: #E0E7FF; /* Light primary color */
+  border-radius: 50%;
+  color: var(--primary-color);
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+/* 8. CALL TO ACTION (CTA) SECTION */
+.cta-section {
+  background: linear-gradient(45deg, var(--primary-color), #36A4F5);
+  width: 100%;
+  border-radius: 1rem;
+}
+
+/* 9. FOOTER */
+.app-footer {
+  background-color: var(--text-dark);
+}
+
+/* login page */
+
+/* 10. LOGIN & SIGNUP PAGE STYLES */
+
+.auth-container {
+  min-height: 100vh;
+  padding: 1rem;
+  
+  /* Add these three lines to enable centering */
+  display: flex;
+  align-items: center; /* This centers the form vertically */
+  justify-content: center; /* This centers the form horizontally */
+  
+  /* The background from before */
+  background-color: var(--primary-color);
+  background-image: linear-gradient(to top right, var(--primary-color), var(--accent-color));
+  background-size: cover;
+  background-position: center center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  border-radius: 1rem;
+  background-color: #FFFFFF; /* A clean, solid white card for a light feel */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h3,
+.auth-card .form-label {
+  color: var(--text-dark); /* Dark text on the light card */
+}
+
+.auth-card .text-muted {
+  color: var(--text-light) !important;
+}
+
+.auth-card .form-control {
+  background-color: var(--bg-light); /* Light gray background for inputs */
+  border: 1px solid #e5e7eb;
+  color: var(--text-dark);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.auth-card .form-control::placeholder {
+  color: #9ca3af;
+}
+
+.auth-card .form-control:focus {
+  background-color: #FFFFFF;
+  border-color: var(--primary-color); /* Use primary color for focus */
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25); /* Primary color glow */
+}
+
+.auth-card .brand-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+}
+
+.auth-card a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-card a:hover {
+  text-decoration: underline;
+  color: #4338CA;
+}
+
+.auth-card .btn-primary-custom {
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* Specific styling for the wider signup form */
+.auth-card.large-form {
+  max-width: 650px; /* Wider for the signup form */
+}
+
+
+/* --- src/assets/css/main.css --- */
+
+/* --- (Updated ADMIN DASHBOARD - REVISED Section) --- */
+
+/* 13. ADMIN DASHBOARD - REVISED */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  /* New, light blue background color */
+  background-color: #EEF2FF; 
+}
+
+/* Sidebar Styling (No changes) */
+.sidebar {
+  width: 260px;
+  background-color: var(--text-dark);
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  padding: 1rem 0;
+}
+
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  color: #adb5bd;
+  padding: 0.9rem 1.5rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+
+.sidebar-nav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+}
+
+.sidebar-nav .nav-link.active,
+.router-link-exact-active { /* Targets Vue's active class */
+  color: #FFFFFF;
+  background-color: rgba(20, 241, 149, 0.1);
+  border-left-color: var(--accent-color);
+}
+
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content Area (No changes) */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.content-header .form-control {
+  background-color: #FFFFFF;
+}
+
+/* Action Cards (Updated border color) */
+.action-card {
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  padding: 2rem;
+  /* Softer border color to match new background */
+  border: 1px solid #E0E7FF;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.1); /* Subtle primary color shadow */
+}
+
+.action-card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #FFFFFF;
+  margin-bottom: 1.5rem;
+}
+
+/* Dynamic icon colors based on your data (No changes) */
+.action-card-icon.primary { background-color: var(--primary-color); }
+.action-card-icon.success { background-color: #10B981; }
+.action-card-icon.warning { background-color: #F59E0B; }
+
+.action-card h4 {
+  margin-bottom: 0.5rem;
+}
+
+.action-card p {
+  flex-grow: 1; 
+  margin-bottom: 1.5rem;
+}
+
+
+/* manag_subject */
+/* 14. ADMIN MANAGE PAGES (Subjects, Quizzes, etc.) */
+.accordion-item {
+  background-color: #FFFFFF;
+  border: 1px solid #E0E7FF !important;
+  border-radius: 0.75rem !important;
+  margin-bottom: 1rem;
+}
+
+.accordion-header {
+  border-radius: 0.75rem;
+}
+
+.accordion-button {
+  border-radius: 0.75rem !important;
+  background-color: #FFFFFF !important;
+  color: var(--text-dark) !important;
+  box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #f9fafb !important;
+  box-shadow: inset 0 -1px 0 #e5e7eb !important;
+}
+
+.accordion-button::after {
+  /* Prettier chevron icon */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234F46E5'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+}
+
+.accordion-body {
+  padding: 1.5rem;
+}
+
+/* Modal Header Styling */
+.modal-header {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Modern Table inside Accordion */
+.modern-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden; /* Ensures rounded corners on table */
+}
+
+.modern-table thead {
+  background-color: #f9fafb;
+}
+
+.modern-table thead th {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  color: var(--text-light);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modern-table tbody td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+/* manage user */
+/* 15. ADMIN USER PAGE STYLES */
+
+.status-badge {
+  padding: 0.4em 0.8em;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.status-badge.male {
+  background-color: #DBEAFE; /* Light Blue */
+  color: #1E40AF; /* Dark Blue */
+}
+
+.status-badge.female {
+  background-color: #FCE7F3; /* Light Pink */
+  color: #9D174D; /* Dark Pink */
+}
+
+.status-badge.other {
+  background-color: #E5E7EB; /* Light Gray */
+  color: #374151; /* Dark Gray */
+}
+
+/* 16. MODERN SEARCH BAR STYLES */
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.search-wrapper .form-control {
+  padding-left: 2.5rem; /* Make space for the icon */
+  border-radius: 20px !important; /* Pill shape */
+  background-color: #FFFFFF;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  pointer-events: none; /* Make the icon non-clickable */
+}
+
+/* manage quiz */
+
+/* 17. ADMIN MANAGE QUIZ PAGE STYLES */
+
+.status-badge.active {
+  background-color: #D1FAE5; /* Light Green */
+  color: #065F46; /* Dark Green */
+}
+
+.status-badge.inactive {
+  background-color: #FEF3C7; /* Light Yellow/Amber */
+  color: #92400E; /* Dark Yellow/Amber */
+}
+
+/* 18. ADMIN SUMMARY & CHARTS */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 350px; /* Set a fixed height for consistency */
+}
+
+
+/* 20. USER DASHBOARD STYLES */
+/* 21. USER DASHBOARD - ROBUST CARDS */
+.quiz-card-v2 {
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  border: 1px solid #E0E7FF;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quiz-card-v2:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.1);
+}
+
+.quiz-card-v2-header {
+  padding: 1.5rem 1.5rem 1rem; /* Adjusted padding */
+}
+
+.quiz-card-v2-body {
+  padding: 0 1.5rem 1.5rem;
+  flex-grow: 1; /* Allows footer to stick to the bottom */
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-card-v2-footer {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #E0E7FF;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+
+.quiz-subject-badge {
+  display: inline-block;
+  background-color: #E0E7FF;
+  color: var(--primary-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.quiz-details-list-user {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  width: 100%;
+}
+
+.quiz-details-list-user li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-details-list-user li i {
+  width: 20px;
+  text-align: center;
+  margin-right: 0.5rem;
+  color: var(--primary-color);
+}
+
+/* 23. START QUIZ PAGE STYLES */
+
+.quiz-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column on mobile */
+  gap: 1.5rem;
+}
+
+/* Two columns on larger screens */
+@media (min-width: 992px) {
+  .quiz-layout-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.question-block {
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.question-block:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.question-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+}
+
+.question-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #EEF2FF;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
+
+/* Custom Radio Buttons */
+.options-group .form-check {
+  margin-bottom: 0.75rem;
+}
+.options-group .form-check-input {
+  cursor: pointer;
+  border-color: #ced4da;
+}
+.options-group .form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.options-group .form-check-label {
+  cursor: pointer;
+  padding-left: 0.5rem;
+}
+
+/* Quiz Info Panel */
+.timer-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--text-dark);
+}
+.timer-display .time-value {
+  margin-left: auto;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+.btn-success-custom {
+  background-color: #10B981;
+  border-color: #10B981;
+  color: white;
+}
+.btn-success-custom:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+/* Results Summary Card */
+.results-summary-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  padding: 2rem;
+}
+.result-item {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+.result-item:last-child {
+  border-bottom: none;
+}
+.result-question {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.result-answer {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa; /* Neutral light gray */
+  color: var(--text-dark);
+  border: 1px solid #e5e7eb;
+}
+
+/* 24. VIEW QUESTIONS MODAL */
+.question-list .list-group-item {
+  border-left: none;
+  border-right: none;
+  padding: 1rem 0;
+}
+.question-list .list-group-item:first-child {
+  padding-top: 0;
+}
+.question-list .list-group-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.options-list li {
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+  color: #6c757d; /* Muted text color */
+}
+.options-list li.correct-answer {
+  color: #198754; /* Success color */
+  font-weight: 600;
+}
+.options-list li i {
+  width: 20px;
+  color: #ced4da;
+}
+.options-list li.correct-answer i {
+  color: #198754;
+}
+
+
+/* 24. VIEW QUESTIONS MODAL */
+.question-list .list-group-item {
+  border-left: none;
+  border-right: none;
+  padding: 1rem 0;
+}
+.question-list .list-group-item:first-child {
+  padding-top: 0;
+}
+.question-list .list-group-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.options-list li {
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+  color: #6c757d; /* Muted text color */
+}
+.options-list li.correct-answer {
+  color: #198754; /* Success color */
+  font-weight: 600;
+}
+.options-list li i {
+  width: 20px;
+  color: #ced4da;
+}
+.options-list li.correct-answer i {
+  color: #198754;
+}

@@ -1,90 +1,85 @@
 <template>
-  <div>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4 py-2 mb-4">
-      <span class="navbar-text text-white me-3">
-        <i class="fas fa-user-circle me-2"></i> Welcome, <strong>{{ username }}</strong>
-      </span>
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <router-link class="nav-link text-white" to="/user">
-            <i class="fas fa-home me-1"></i>Home
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link text-white" to="/user_results">
-            <i class="fas fa-chart-bar me-1"></i>User Results
-          </router-link>
-        </li>
-      </ul>
-      <form class="d-flex me-3">
-        <div class="input-group">
-          <input v-model="searchQuery" class="form-control" type="search" placeholder="Search quiz/subject/chapter">
-          <button class="btn btn-light" type="button" @click="searchQuiz">
-            <i class="fas fa-search"></i>
-          </button>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3 class="text-white">QuizMaster</h3>
+        <small class="text-white-50">User Dashboard</small>
+      </div>
+      <nav class="sidebar-nav">
+        <router-link to="/user" class="nav-link"><i class="fas fa-home me-2"></i>Home</router-link>
+        <router-link to="/user_results" class="nav-link active"><i class="fas fa-chart-bar me-2"></i>My Results</router-link>
+      </nav>
+      <div class="sidebar-footer">
+        <router-link to="/login" class="nav-link text-white-50"><i class="fas fa-sign-out-alt me-2"></i>Logout</router-link>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="content-header">
+        <div>
+          <h2 class="fw-bold">My Score Report</h2>
+          <p class="text-muted">A summary of all your quiz attempts.</p>
         </div>
-      </form>
-      <router-link to="/login" class="btn btn-outline-light">
-        <i class="fas fa-sign-out-alt me-1"></i>Logout
-      </router-link>
-    </nav>
+        <div class="d-flex align-items-center gap-3">
+            <div class="search-wrapper">
+              <i class="fas fa-search search-icon"></i>
+              <input class="form-control" type="search" placeholder="Search results..." v-model="searchQuery" />
+            </div>
+            <button class="btn btn-primary-custom" @click="exportCSV">
+              <i class="fas fa-file-csv me-2"></i>Export CSV
+            </button>
+        </div>
+      </header>
 
-    <!-- Scores Table -->
-    <div class="container">
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <h3 class="text-center mb-4 text-primary">
-            <i class="fas fa-star me-2"></i>User Score Report
-          </h3>
+      <section class="mt-4">
+        <div class="data-card">
+          <div v-if="filteredScores.length === 0" class="text-center p-5">
+            <i class="fas fa-box-open fa-2x text-muted mb-3"></i>
+            <p class="lead text-muted">You haven't completed any quizzes yet.</p>
+          </div>
 
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-              <thead class="table-primary text-center">
+          <div class="table-responsive" v-else>
+            <table class="table modern-table">
+              <thead>
                 <tr>
-                  <th>Subject</th>
-                  <th>Chapter</th>
-                  <th>Quiz</th>
+                  <th>Quiz Title</th>
                   <th>Score</th>
-                  <th>Total Marks</th>
                   <th>Percentage</th>
                   <th>Grade</th>
-                  <th>Date & Time</th>
+                  <th>Date</th>
                 </tr>
               </thead>
-              <tbody class="text-center">
+              <tbody>
                 <tr v-for="score in filteredScores" :key="score.id">
-                  <td>{{ score.subject_name }}</td>
-                  <td>{{ score.chapter_name }}</td>
-                  <td>{{ score.quiz_title }}</td>
-                  <td><span class="badge bg-success">{{ score.score }}</span></td>
-                  <td>{{ score.total_possible_marks }}</td>
-                  <td>{{ score.percentage }}%</td>
                   <td>
-                    <span class="badge" :class="score.grade === 'Excellent' ? 'bg-success' : 'bg-warning text-dark'">
-                      {{ score.grade }}
-                    </span>
+                    <div class="fw-bold">{{ score.quiz_title }}</div>
+                    <small class="text-muted">{{ score.subject_name }} / {{ score.chapter_name }}</small>
                   </td>
-                  <td>{{ score.date_taken }}</td>
-                </tr>
-                <tr v-if="filteredScores.length === 0">
-                  <td colspan="8" class="text-muted">No scores found for your search.</td>
+                  <td>
+                    <span class="fw-bold">{{ score.score }} / {{ score.total_possible_marks }}</span>
+                  </td>
+                  <td>
+                    <div class="progress-wrapper">
+                      <div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" :style="{ width: score.percentage + '%' }" :aria-valuenow="score.percentage" aria-valuemin="0" aria-valuemax="100">
+                          {{ score.percentage }}%
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge status-badge" :class="getGradeClass(score.grade)">{{ score.grade }}</span>
+                  </td>
+                  <td>{{ formatDateTime(score.date_taken) }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
-          <div class="text-center mt-4">
-            <button class="btn btn-outline-primary" @click="exportCSV">
-              <i class="fas fa-file-csv me-2"></i>Export to CSV
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -121,6 +116,29 @@ export default {
         console.error('Error fetching scores:', error);
       });
     },
+    getGradeClass(grade) {
+      if (grade === 'Excellent') return 'active'; // Uses the green 'active' style
+      if (grade === 'Good') return 'male'; // Re-using the blue style
+      return 'inactive'; 
+    },
+    formatDateTime(utcDateString) {
+    if (!utcDateString) return 'N/A';
+    
+    const date = new Date(utcDateString + 'Z'); 
+    
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      // timeZoneName: 'short' // Optional: adds timezone like "IST"
+    };
+    
+    // This will now use the user's local timezone for formatting
+    return new Intl.DateTimeFormat('en-IN', options).format(date);
+  },
     fetchUsername() {
       fetch('https://quiz-app-v2-py9b.onrender.com/user/profile', {
         method: 'GET',
