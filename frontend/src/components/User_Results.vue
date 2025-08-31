@@ -119,25 +119,22 @@ export default {
     getGradeClass(grade) {
       if (grade === 'Excellent') return 'active'; // Uses the green 'active' style
       if (grade === 'Good') return 'male'; // Re-using the blue style
-      return 'inactive'; 
+      return 'inactive'; // Uses the yellow 'inactive' style
     },
-    formatDateTime(utcDateString) {
-    if (!utcDateString) return 'N/A';
+    formatDateTime(isoString) {
+    if (!isoString) return 'N/A';
     
-    const date = new Date(utcDateString + 'Z'); 
-    
+    const date = new Date(isoString);
     const options = {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
-      // timeZoneName: 'short' // Optional: adds timezone like "IST"
+      hour12: true // This is the key for 12-hour format
     };
     
-    // This will now use the user's local timezone for formatting
-    return new Intl.DateTimeFormat('en-IN', options).format(date);
+    return new Intl.DateTimeFormat('en-US', options).format(date);
   },
     fetchUsername() {
       fetch('https://quiz-app-v2-py9b.onrender.com/user/profile', {

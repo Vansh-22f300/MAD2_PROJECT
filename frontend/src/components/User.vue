@@ -32,7 +32,7 @@
         </div>
         
         <div class="row g-4" v-else>
-          <div class="col-md-6 col-lg-4" v-for="quiz in quizzes" :key="quiz.id">
+          <div class="col-md-6 col-lg-4" v-for="quiz in filteredQuizzes" :key="quiz.id">
             <div class="quiz-card-v2 h-100">
               <div class="quiz-card-v2-header">
                 <span class="quiz-subject-badge">{{ quiz.subject_name }}</span>
@@ -75,9 +75,23 @@ export default {
   },
   computed: {
     filteredQuizzes() {
-      const q = this.searchQuery.toLowerCase();
-      return this.quizzes.filter(quiz => quiz.title.toLowerCase().includes(q));
+    // 1. If the search bar is empty, show all quizzes
+    if (!this.searchQuery) {
+      return this.quizzes;
     }
+    
+    // 2. Prepare the search query (lowercase and no extra spaces)
+    const query = this.searchQuery.toLowerCase().trim();
+    
+    return this.quizzes.filter(quiz => {
+      // 3. Safely check for a match in the title, subject, OR chapter
+      const titleMatch = quiz.title && quiz.title.toLowerCase().includes(query);
+      const subjectMatch = quiz.subject_name && quiz.subject_name.toLowerCase().includes(query);
+      const chapterMatch = quiz.chapter_name && quiz.chapter_name.toLowerCase().includes(query);
+      
+      return titleMatch || subjectMatch || chapterMatch;
+    });
+  }
   },
   methods: {
     fetchQuizzes() {
