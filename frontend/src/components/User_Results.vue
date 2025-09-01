@@ -70,7 +70,7 @@
                   <td>
                     <span class="badge status-badge" :class="getGradeClass(score.grade)">{{ score.grade }}</span>
                   </td>
-                  <td>{{ formatDateTime(score.date_taken) }}</td>
+                  <td>{{score.date_taken}}</td>
                 </tr>
               </tbody>
             </table>
@@ -121,20 +121,37 @@ export default {
       if (grade === 'Good') return 'male'; // Re-using the blue style
       return 'inactive'; // Uses the yellow 'inactive' style
     },
-    formatDateTime(isoString) {
-    if (!isoString) return 'N/A';
-    
-    const date = new Date(isoString);
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // This is the key for 12-hour format
-    };
-    
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+    formatDateTime(utcDateString) {
+    if (!utcDateString || typeof utcDateString !== 'string') {
+      return 'N/A';
+    }
+
+    try {
+      // Create a valid ISO 8601 string by replacing the space with 'T' and adding 'Z' for UTC
+      const validISOString = utcDateString.replace(' ', 'T') + 'Z';
+      const date = new Date(validISOString);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date created from string');
+      }
+
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'Asia/Kolkata' // Ensures IST
+      };
+      
+      return new Intl.DateTimeFormat('en-IN', options).format(date);
+
+    } catch (error) {
+      console.error('Could not format date:', utcDateString, error);
+      return 'Invalid Date'; // Return a safe string instead of crashing
+    }
   },
     fetchUsername() {
       fetch('https://quiz-app-v2-py9b.onrender.com/user/profile', {
