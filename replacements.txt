@@ -1,0 +1,1 @@
+postgresql://neondb_owner:npg_smDJ0MoLpI8Y@ep-long-wave-a194lj9w-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require==postgresql://USERNAME:PASSWORD@HOST:PORT/DBNAME
